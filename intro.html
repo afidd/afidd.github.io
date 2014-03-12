@@ -1,0 +1,163 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Semi-Markov 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
+    <link rel="next" title="Requirements and Installation" href="install.html" />
+    <link rel="prev" title="AFIDD: Semi-Markov" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="install.html" title="Requirements and Installation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="AFIDD: Semi-Markov"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>This is a library to simulate trajectories of semi-Markov processes in
+continuous time. It represents these processes as Generalized
+Stochastic Petri Nets. The goal of this library is to create a
+clear specification for, and efficient computation of, these systems.</p>
+<p>A Generalized Stochastic Petri Net (GSPN) is a formal way to specify a
+a system of interacting, competing processes. We think of the system
+as having mutually-exclusive sub-states which together determine the
+whole state. Like checkers on a game board, the state of this system
+is determined by <em>tokens</em> located at <em>places.</em> The location of all the
+tokens together is called the <em>marking.</em>
+Each independent process is competing to move tokens from one place
+to another, which changes the system state and may enable or disable
+other processes.</p>
+<div class="section" id="dairy-herd-example">
+<h2>Dairy Herd Example<a class="headerlink" href="#dairy-herd-example" title="Permalink to this headline">¶</a></h2>
+<p>As an example, let&#8217;s look at a simple model for the farm management
+of dairy cows, following <a class="reference internal" href="#viet2004">[viet2004]</a>.
+There are four groups, calves, heifers before breeding
+(heifer 1), heifers ready for breeding (heifer 2), and dairy cows
+which give birth to new calves. We might make a sketch as shown here.</p>
+<a class="reference internal image-reference" href="_images/bvd_gist.svg"><div align="center" class="align-center"><img alt="Cow management has four stages, calf, heifer 1, heifer 2, and dairy." src="_images/bvd_gist.svg" /></div>
+</a>
+<p>We may have several different goals for this model. We may want to ask
+how quickly a disease might spread through a herd, on average. We may
+want to parameterize a differential equation model for changes in
+herd sizes given economic conditions. The data for this model, though,
+come in the form of charts of how many days it took a particular set
+of heifers to give birth after their first insemination. It comes in
+the form of rules that farmers with too many calves to fit in the pen
+sell the rest. We are going to use a GSPN to express this model
+in terms of the measured quantities.</p>
+<p>The chart above shows a set of states for the cow, but it isn&#8217;t clear,
+for instance, about the number of ways a cow can leave the farm.
+There can be two ways a cow can <em>transition</em> to leaving the
+farm: sale or death.</p>
+<table class="docutils citation" frame="void" id="viet2004" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[viet2004]</a></td><td>A.-F. Viet, C. Fourichon, H. Seegers, C. Jacob, and C. Guihenneuc-Jouyaux, “A model of the spread of the bovine viral-diarrhoea virus within a dairy herd.,” Prev. Vet. Med., vol. 63, no. 3–4, pp. 211–36, May 2004.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#dairy-herd-example">Dairy Herd Example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">AFIDD: Semi-Markov</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="next chapter">Requirements and Installation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/intro.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="install.html" title="Requirements and Installation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="AFIDD: Semi-Markov"
+             >previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Andrew Dolgert, David Schneider.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,243 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ExplicitTransitions &mdash; Semi-Markov 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
+    <link rel="next" title="Simulating the Trajectory of a Semi-Markov GSPN" href="gspntrajectory.html" />
+    <link rel="prev" title="Concepts" href="concepts.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="gspntrajectory.html" title="Simulating the Trajectory of a Semi-Markov GSPN"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Concepts"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="explicittransitions">
+<h1>ExplicitTransitions<a class="headerlink" href="#explicittransitions" title="Permalink to this headline">¶</a></h1>
+<p>The ExplicitTransitions class implements the GSPN concept in two parts.
+The Petri net, with stochiometry, is represented by a graph from
+the Boost Graph Library. The transitions of the GSPN are represented
+by Transition objects, each of which can calculate whether a transition
+is enabled and what it does when it fires.</p>
+<p>There are three steps to making a GSPN using ExplicitTransitions:
+Build the graph, make a marking, then add Transitions and the graph
+to the ExplicitTransitions object, which represents the GSPN concept.</p>
+<p>The Boost graph models the bipartite Petri net by having vertices
+with two colors, Place and Transition. It is a bidirectional graph,
+meaning it is directed but with O(1) access to the inputs of a transition,
+which a simple directional graph would not offer. The input and output
+edges of all transitions are ordered, because a transition in a GSPN
+can depend arbitrarily on the marking. This means a transition can
+as for its second input instead of asking for the input of a particular
+place. The Boost graph implementation is therefore:</p>
+<div class="highlight-python"><pre>enum class PetriGraphColor : int { Unused, Place, Transition };
+
+struct PetriGraphVertexProperty
+{
+  PetriGraphColor color;
+  size_t token_layer;
+};
+
+struct PetriGraphEdgeProperty
+{
+  int stochiometric_coefficient;
+};
+
+struct PetriGraphProperty {};
+
+using PetriGraphType=boost::adjacency_list&lt;
+    boost::vecS, // VertexList container
+    boost::vecS, // OutEdgeList container
+    boost::bidirectionalS, // directionality
+    PetriGraphVertexProperty, // Vertex property
+    PetriGraphEdgeProperty, // Edge property
+    PetriGraphProperty, // Graph property
+    boost::vecS // EdgeList container
+    &gt;;</pre>
+</div>
+<p>A single graph can have different types of tokens. Maybe one represents
+available food and another represents a consumer of that food. Each
+token type is stored in a separate layer within the marking. The
+token_layer vertex property is a sanity check that the correct token
+is at the correct place.
+The actual GSPN implementation stores a copy of this graph, not a reference.</p>
+<p>Decide what types this model uses. We can do this first to get the dependencies among types out of the way.:</p>
+<div class="highlight-python"><pre>// Everybody always needs a random number generator.
+using RandGen=boost::random::mt19937;
+// The Net.
+using ModelGraph=PetriGraphType;
+// The type of token.
+struct IndividualToken {};
+// The marking on the net.
+using ModelMarking=Marking&lt;place_t&lt;ModelGraph&gt;, Uncolored&lt;IndividualToken&gt;&gt;;
+// The state of the system.
+using ModelState=GSPNState&lt;ModelGraph, ModelMarking&gt;;
+// Now we can make the GSPN type.
+using ModelGSPN=ExplicitTransitions&lt;LocalMarking&lt;Mark&gt;,
+  ModelState,ModelGraph,RandGen&gt;;</pre>
+</div>
+<p>Each transition is derived from a base class, ExplicitTransitions::Transition.
+Different transitions in the model are different derived classes of this.
+A transition defines two methods. The enabled() method returns whether a
+transition is enabled and what its distribution is if it is enabled.
+The fire() method determines how to move and change tokens when they fire.
+Both read and/or modify the current system state and the local marking, which
+has convenience functions to read or move tokens automatically given
+stochiometry of the transition.:</p>
+<div class="highlight-python"><pre>class ModelMovement : public ModelGSPN::Transition
+{
+   virtual std::pair&lt;bool, std::unique_ptr&lt;Dist&gt;&gt;
+   enabled(const SIRState&amp; s, const LocalMarking&lt;Mark&gt;&amp; lm) const override
+   {
+     if (lm.template input_tokens_sufficient&lt;0&gt;())
+     {
+       return {true, std::unique_ptr&lt;ExpDist&gt;(new ExpDist(1.0))};
+     }
+     else
+     {
+       return {false, std::unique_ptr&lt;NoDist&gt;(new NoDist())};
+     }
+   }
+
+   virtual void fire(SIRState&amp; s, LocalMarking&lt;Mark&gt;&amp; lm,
+       RandGen&amp; rng) const override
+   {
+     BOOST_LOG_TRIVIAL(debug) &lt;&lt; &quot;Fire movement &quot; &lt;&lt; lm;
+     lm.template transfer_by_stochiometric_coefficient&lt;0&gt;(rng);
+   }
+};</pre>
+</div>
+<p>There are likely many types of transitions in any given GSPN.</p>
+<p>Finally the types are decided. Now we create the objects.
+The order of instantiation depends on the problem For this exercise,
+assume there are lists containing places, transitions, and edges.:</p>
+<div class="highlight-python"><pre>// Initialize the Boost Graph with a number of vertices.
+ModelGraph graph(37);
+ModelGSPN gspn(graph); // Make the GSPN.
+
+// Identify each place in the graph.
+PetriGraphVertexProperty vprop;
+for (auto place_idx : places)
+{
+  vprop.color=PetriGraphColor::Place;
+  vprop.token_layer=0;
+  gspn.graph[place_idx]=vprop;
+}
+
+// Identify each transition.
+for (auto transition_idx : transitions)
+{
+  vprop.color=PetriGraph::Transition;
+  gspn.graph[transition_idx]=vprop;
+  gspn.transitions.emplace(transition_idx,
+    std::move(std::unique_ptr&lt;ModelGSPN::Transition&gt;(
+    new ModelMovement())));
+}
+
+// Edges get stochiometry.
+for (auto edge : edges)
+{
+  auto left_vertex=std::get&lt;0&gt;(edge);
+  auto right_vertex=std::get&lt;1&gt;(edge);
+  auto stochiometry=std::get&lt;2&gt;(edge);
+  add_edge(left_vertex, right_vertex, stochiometry, gspn.graph);
+}</pre>
+</div>
+<p>By the end, a GSPN with places and transitions is complete.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="concepts.html"
+                        title="previous chapter">Concepts</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gspntrajectory.html"
+                        title="next chapter">Simulating the Trajectory of a Semi-Markov GSPN</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/explicit.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="gspntrajectory.html" title="Simulating the Trajectory of a Semi-Markov GSPN"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Concepts"
+             >previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Andrew Dolgert, David Schneider.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
