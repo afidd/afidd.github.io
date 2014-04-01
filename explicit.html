@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>ExplicitTransitions &mdash; Semi-Markov 1.0 documentation</title>
+    <title>Using ExplicitTransitions to Construct a GSPN &mdash; Semi-Markov 1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -28,7 +28,7 @@
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
     <link rel="next" title="Simulating the Trajectory of a Semi-Markov GSPN" href="gspntrajectory.html" />
-    <link rel="prev" title="Concepts" href="concepts.html" /> 
+    <link rel="prev" title="Mathematics of the Semi-Markov Model and GSPN" href="mathematics.html" /> 
   </head>
   <body>
     <div class="related">
@@ -41,7 +41,7 @@
           <a href="gspntrajectory.html" title="Simulating the Trajectory of a Semi-Markov GSPN"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="concepts.html" title="Concepts"
+          <a href="mathematics.html" title="Mathematics of the Semi-Markov Model and GSPN"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
       </ul>
@@ -52,138 +52,238 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="explicittransitions">
-<h1>ExplicitTransitions<a class="headerlink" href="#explicittransitions" title="Permalink to this headline">¶</a></h1>
-<p>The ExplicitTransitions class implements the GSPN concept in two parts.
-The Petri net, with stochiometry, is represented by a graph from
-the Boost Graph Library. The transitions of the GSPN are represented
-by Transition objects, each of which can calculate whether a transition
-is enabled and what it does when it fires.</p>
-<p>There are three steps to making a GSPN using ExplicitTransitions:
-Build the graph, make a marking, then add Transitions and the graph
-to the ExplicitTransitions object, which represents the GSPN concept.</p>
-<p>The Boost graph models the bipartite Petri net by having vertices
-with two colors, Place and Transition. It is a bidirectional graph,
-meaning it is directed but with O(1) access to the inputs of a transition,
-which a simple directional graph would not offer. The input and output
-edges of all transitions are ordered, because a transition in a GSPN
-can depend arbitrarily on the marking. This means a transition can
-as for its second input instead of asking for the input of a particular
-place. The Boost graph implementation is therefore:</p>
-<div class="highlight-python"><pre>enum class PetriGraphColor : int { Unused, Place, Transition };
-
-struct PetriGraphVertexProperty
+  <div class="section" id="using-explicittransitions-to-construct-a-gspn">
+<h1>Using ExplicitTransitions to Construct a GSPN<a class="headerlink" href="#using-explicittransitions-to-construct-a-gspn" title="Permalink to this headline">¶</a></h1>
+<p>The ExplicitTransitions class implements the GSPN concept.</p>
+<div class="section" id="the-type-of-the-gspn-model">
+<h2>The Type of the GSPN Model<a class="headerlink" href="#the-type-of-the-gspn-model" title="Permalink to this headline">¶</a></h2>
+<p>The author of the code supplies building blocks to this class:</p>
+<ul class="simple">
+<li>A token type. It should have an ostream <tt class="docutils literal"><span class="pre">operator&lt;&lt;</span></tt> defined.
+It may have any necessary data, such as a birth date
+or size of truck. It must have a default constructor. The simplest
+choice is to construct a <a class="reference external" href="http://en.wikipedia.org/wiki/C++11#Modification_to_the_definition_of_plain_old_data">POD type</a>.</li>
+<li>A storage container for tokens at a place. The allowed option
+is Uncolored&lt;TokenType&gt;, which is an <tt class="docutils literal"><span class="pre">std::vector.</span></tt></li>
+<li>A PlaceKey, which is another POD type to uniquely identify
+a place in the GSPN. It needs less-than, equal-to, and print
+operators.</li>
+<li>A TransitionKey, which uniquely identifies transitions in the
+GSPN. It needs less-than, equal-to, and print
+operators.</li>
+<li>UserState. The system state consists of marking, enabled
+transitions, and the absolute time. The optional UserState
+struct will add arbitrary members to the state for convenience.
+If a transition were to modify this state such that other
+transitions would have new different enabling or distributions,
+the system would no longer be semi-Markov. This state is
+a good place to put constant parameters or links to
+external data, such as weather.</li>
+<li>A random number generator. The system assumes a single
+generator for everything. This class supports the C++
+<tt class="docutils literal"><span class="pre">random</span></tt> requirements.</li>
+</ul>
+<p>An example of a <tt class="docutils literal"><span class="pre">PlaceKey</span></tt> from an SIR model shows that defining
+such a struct is verbose but painless:</p>
+<div class="highlight-python"><pre>struct SIRPlace
 {
-  PetriGraphColor color;
-  size_t token_layer;
-};
+  size_t disease;
+  size_t individual;
 
-struct PetriGraphEdgeProperty
-{
-  int stochiometric_coefficient;
-};
+  SIRPlace()=default;
+  SIRPlace(size_t d, size_t i)
+  : disease(d), individual(i)
+  {}
 
-struct PetriGraphProperty {};
+  friend inline
+  bool operator&lt;(const SIRPlace&amp; a, const SIRPlace&amp; b)
+  {
+    return lazy_less(a.disease, b.disease, a.individual,
+      b.individual);
+  }
 
-using PetriGraphType=boost::adjacency_list&lt;
-    boost::vecS, // VertexList container
-    boost::vecS, // OutEdgeList container
-    boost::bidirectionalS, // directionality
-    PetriGraphVertexProperty, // Vertex property
-    PetriGraphEdgeProperty, // Edge property
-    PetriGraphProperty, // Graph property
-    boost::vecS // EdgeList container
-    &gt;;</pre>
-</div>
-<p>A single graph can have different types of tokens. Maybe one represents
-available food and another represents a consumer of that food. Each
-token type is stored in a separate layer within the marking. The
-token_layer vertex property is a sanity check that the correct token
-is at the correct place.
-The actual GSPN implementation stores a copy of this graph, not a reference.</p>
-<p>Decide what types this model uses. We can do this first to get the dependencies among types out of the way.:</p>
-<div class="highlight-python"><pre>// Everybody always needs a random number generator.
-using RandGen=boost::random::mt19937;
-// The Net.
-using ModelGraph=PetriGraphType;
-// The type of token.
-struct IndividualToken {};
-// The marking on the net.
-using ModelMarking=Marking&lt;place_t&lt;ModelGraph&gt;, Uncolored&lt;IndividualToken&gt;&gt;;
-// The state of the system.
-using ModelState=GSPNState&lt;ModelGraph, ModelMarking&gt;;
-// Now we can make the GSPN type.
-using ModelGSPN=ExplicitTransitions&lt;LocalMarking&lt;Mark&gt;,
-  ModelState,ModelGraph,RandGen&gt;;</pre>
-</div>
-<p>Each transition is derived from a base class, ExplicitTransitions::Transition.
-Different transitions in the model are different derived classes of this.
-A transition defines two methods. The enabled() method returns whether a
-transition is enabled and what its distribution is if it is enabled.
-The fire() method determines how to move and change tokens when they fire.
-Both read and/or modify the current system state and the local marking, which
-has convenience functions to read or move tokens automatically given
-stochiometry of the transition.:</p>
-<div class="highlight-python"><pre>class ModelMovement : public ModelGSPN::Transition
-{
-   virtual std::pair&lt;bool, std::unique_ptr&lt;Dist&gt;&gt;
-   enabled(const SIRState&amp; s, const LocalMarking&lt;Mark&gt;&amp; lm) const override
-   {
-     if (lm.template input_tokens_sufficient&lt;0&gt;())
-     {
-       return {true, std::unique_ptr&lt;ExpDist&gt;(new ExpDist(1.0))};
-     }
-     else
-     {
-       return {false, std::unique_ptr&lt;NoDist&gt;(new NoDist())};
-     }
-   }
+  friend inline
+  bool operator==(const SIRPlace&amp; a, const SIRPlace&amp; b)
+  {
+    return (a.disease==b.disease)&amp;&amp; (a.individual==b.individual);
+  }
 
-   virtual void fire(SIRState&amp; s, LocalMarking&lt;Mark&gt;&amp; lm,
-       RandGen&amp; rng) const override
-   {
-     BOOST_LOG_TRIVIAL(debug) &lt;&lt; &quot;Fire movement &quot; &lt;&lt; lm;
-     lm.template transfer_by_stochiometric_coefficient&lt;0&gt;(rng);
-   }
+  friend inline
+  std::ostream&amp;
+  operator&lt;&lt;(std::ostream&amp; os, const SIRPlace&amp; cp)
+  {
+    return os &lt;&lt; &#x27;(&#x27; &lt;&lt; cp.disease &lt;&lt; &quot;, &quot; &lt;&lt; cp.individual&lt;&lt;&#x27;)&#x27;;
+  }
 };</pre>
 </div>
-<p>There are likely many types of transitions in any given GSPN.</p>
-<p>Finally the types are decided. Now we create the objects.
-The order of instantiation depends on the problem For this exercise,
-assume there are lists containing places, transitions, and edges.:</p>
-<div class="highlight-python"><pre>// Initialize the Boost Graph with a number of vertices.
-ModelGraph graph(37);
-ModelGSPN gspn(graph); // Make the GSPN.
+<p>The template parameters for <tt class="docutils literal"><span class="pre">ExplicitTransitions</span></tt> are as above:</p>
+<div class="highlight-python"><pre>typedef LocalMarking&lt;Uncolored&lt;TokenType&gt;&gt; Local;
+typedef ExplicitTransitions&lt;PlaceKey, TransitionKey, Local,
+                            RandGen, UserState&gt; GSPN;</pre>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">LocalMarking</span></tt> class is the marking of input and output tokens
+for a particular transition. Instead of using <tt class="docutils literal"><span class="pre">PlaceKey</span></tt> to identify
+particular sets of tokens, it assumes the transition can access its
+edges with an ordinal (first, second, third). The idea is to define
+transitions which don&#8217;t need to know how their marking is indexed and
+stored.</p>
+</div>
+<div class="section" id="define-transitions">
+<h2>Define Transitions<a class="headerlink" href="#define-transitions" title="Permalink to this headline">¶</a></h2>
+<p>A transition has three responsibilities. Determine when it
+is enabled, choose a continuous variable distribution function
+for its firing time, and modify the marking when it fires.
+Enabling and calculating a distribution happen at the same time,
+so they are in one function.</p>
+<p>A transition inherits from the <tt class="docutils literal"><span class="pre">ExplicitTransition</span></tt> template.
+It acts on the local marking to produce distributions or move
+tokens:</p>
+<div class="highlight-python"><pre>using Transition=ExplicitTransition&lt;Local,RandGen,WithParams&gt;;
+using Dist=TransitionDistribution&lt;RandGen&gt;;
 
-// Identify each place in the graph.
-PetriGraphVertexProperty vprop;
-for (auto place_idx : places)
+class InfectNeighbor : public Transition
 {
-  vprop.color=PetriGraphColor::Place;
-  vprop.token_layer=0;
-  gspn.graph[place_idx]=vprop;
-}
+  virtual std::pair&lt;bool, std::unique_ptr&lt;Dist&gt;&gt;
+  enabled(const UserState&amp; s, const Local&amp; local_marking,
+          double te, double t0) const override
+  {
+    if (local_marking.template input_tokens_sufficient&lt;0&gt;())
+    {
+      return {true, std::unique_ptr&lt;Dist&gt;(
+          new WeibullDistribution(s.params.at(0), te))};
+    }
+    else
+    {
+      return {false, std::unique_ptr&lt;Dist&gt;(nullptr)};
+    }
+  }
 
-// Identify each transition.
-for (auto transition_idx : transitions)
-{
-  vprop.color=PetriGraph::Transition;
-  gspn.graph[transition_idx]=vprop;
-  gspn.transitions.emplace(transition_idx,
-    std::move(std::unique_ptr&lt;ModelGSPN::Transition&gt;(
-    new ModelMovement())));
-}
+  virtual void fire(UserState&amp; s, Local&amp; local_marking,
+                    RandGen&amp; rng) const override
+  {
+    local_marking.template transfer_by_stochiometric_coefficient&lt;0&gt;(rng);
+  }
+};</pre>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">enabled()</span></tt> method&#8217;s parameters are</p>
+<ul class="simple">
+<li><strong>UserState</strong> - This is the same as specified above. It could
+include parameters or a pointer to inhomogeneous drivers of the system.</li>
+<li><strong>local_marking</strong> - Most of the work here is manipulation of the
+local marking. It has methods to add a token, remove a token, move
+a token, read a value from a token, or modify a token. It also has
+convenience methods to move all tokens associated with a marking.
+The local_marking contains stochiometric coefficients for the
+transition.</li>
+<li><strong>enabling_time</strong> - If the transition was previously-enabled,
+this is the previous enabling time. Otherwise, it is the current
+absolute time of the GSPN.</li>
+<li><strong>current time</strong> - The current absolute time of the system.</li>
+</ul>
+<p>For a newly-enabled transition, the current time and enabling time
+will be the same. The <cite>enable</cite> method will be called any time
+a transition fires which shares an input or output place.
+If this transition was enabled and should remain so, then it
+likely wants to keep its original enabling time.</p>
+</div>
+<div class="section" id="using-explicittransitionsbuilder">
+<h2>Using ExplicitTransitionsBuilder<a class="headerlink" href="#using-explicittransitionsbuilder" title="Permalink to this headline">¶</a></h2>
+<p>The implementation of <tt class="docutils literal"><span class="pre">ExplicitTransitions</span></tt> requires that
+we construct it with a builder which then produces the GSPN
+object. The builder has just three methods, <cite>add_place()</cite>,
+<cite>add_transition()</cite>, and <cite>build()</cite>. It checks that transitions
+have, as inputs and outputs, places which exist. It ensures
+every PlaceKey and TransitionKey is unique. The signatures
+of its methods:</p>
+<div class="highlight-python"><pre>void BuildGraph::add_place(const PlaceKey&amp;, size_t token_layer);
 
-// Edges get stochiometry.
-for (auto edge : edges)
+typedef std::tuple&lt;PlaceKey,int&gt; BuildGraph::PlaceEdge;
+
+void BuildGraph::add_transition(const TransitionKey&amp;,
+    const std::vector&lt;BuildGraph::PlaceEdge&gt;&amp;,
+    std::unique_ptr&lt;ExplicitTransition&lt;&lt;Local,RandGen,WithParams&gt;);</pre>
+</div>
+<p>The <cite>PlaceEdge</cite> contains a PlaceKey and a stochiometric coefficient,
+which should be negative on inputs and positive on outputs, and specifies
+the number of tokens required and the number to move when firing.</p>
+<p>For example, we can take advantage of the C++ initializer_list
+to construct a GSPN succinctly:</p>
+<div class="highlight-python"><pre>GSPN
+build_system(size_t individual_cnt)
 {
-  auto left_vertex=std::get&lt;0&gt;(edge);
-  auto right_vertex=std::get&lt;1&gt;(edge);
-  auto stochiometry=std::get&lt;2&gt;(edge);
-  add_edge(left_vertex, right_vertex, stochiometry, gspn.graph);
+  BuildGraph&lt;GSPN&gt; bg;
+  using Edge=BuildGraph&lt;GSPN&gt;::PlaceEdge;
+
+  enum { s, i, r };
+
+  for (size_t ind_idx=0; ind_idx&lt;individual_cnt; ind_idx++)
+  {
+    for (size_t place : std::vector&lt;int&gt;{s, i, r})
+    {
+      bg.add_place({place, ind_idx}, 0);
+    }
+  }
+
+  for (size_t left_idx=0; left_idx&lt;individual_cnt-1; left_idx++)
+  {
+    bg.add_transition({left_idx, left_idx, 0},
+      {Edge{{i, left_idx}, -1}, Edge{{r, left_idx}, 1}},
+      std::unique_ptr&lt;SIRTransition&gt;(new Recover())
+      );
+
+    for (size_t right_idx=left_idx+1; right_idx&lt;individual_cnt; right_idx++)
+    {
+      SIRPlace left{i, left_idx};
+      SIRPlace rights{s, right_idx};
+      SIRPlace righti{i, right_idx};
+
+      bg.add_transition({left_idx, right_idx, 0},
+        {Edge{left, -1}, Edge{rights, -1}, Edge{left, 1}, Edge{righti, 1}},
+        std::unique_ptr&lt;SIRTransition&gt;(new InfectNeighbor()));
+
+      SIRPlace lefts{s, left_idx};
+      SIRPlace lefti{i, left_idx};
+      SIRPlace right{i, right_idx};
+
+      bg.add_transition({right_idx, left_idx, 0},
+        {Edge{right, -1}, Edge{lefts, -1}, Edge{right, 1}, Edge{lefti, 1}},
+        std::unique_ptr&lt;SIRTransition&gt;(new InfectNeighbor()));
+    }
+  }
+
+  // std::move the transitions because they contain unique_ptr.
+  return std::move(bg.build());
 }</pre>
 </div>
-<p>By the end, a GSPN with places and transitions is complete.</p>
+</div>
+<div class="section" id="create-marking-and-state">
+<h2>Create Marking and State<a class="headerlink" href="#create-marking-and-state" title="Permalink to this headline">¶</a></h2>
+<p>The last step is to create the marking and state.
+There is one implementation of a marking in the library.
+While we defined a <cite>PlaceKey</cite> above, the <cite>ExplicitTransitions</cite>
+class uses a different place and transition key internally,
+chosen by the Boost Graph Library implementation. Both are
+just type <cite>size_t</cite>. The marking and state are therefore:</p>
+<div class="highlight-python"><pre>using Mark=Marking&lt;size_t, Uncolored&lt;IndividualToken&gt;&gt;;
+using State=GSPNState&lt;Mark,UserState&gt;;
+
+State state;</pre>
+</div>
+<p>If the <cite>UserState</cite> had a member named <cite>parameters</cite>, then we could access
+it as <cite>state.user.parameters</cite>.</p>
+<p>How do we initialize the marking? Unfortunately, the marking doesn&#8217;t
+use our <cite>PlaceKey</cite>, so we have to add a translation step from
+the <cite>PlaceKey</cite> we know to the <cite>size_t</cite> we don&#8217;t:</p>
+<div class="highlight-python"><pre>size_t susceptible=gspn.place_vertex(
+    PlaceKey{Disease::Susceptible, individual_idx});
+add&lt;0&gt;(state.marking, susceptible, IndividualToken{});</pre>
+</div>
+<p>The GSPN remembers the original <cite>PlaceKey</cite> and will translate
+for us. The second line adds a new token to the marking.</p>
+<p>That&#8217;s everything that defines the model and the state of the system.
+We made places, transitions, and a marking. The next step is
+to simulate a trajectory of the system.</p>
+</div>
 </div>
 
 
@@ -192,9 +292,20 @@ for (auto edge : edges)
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using ExplicitTransitions to Construct a GSPN</a><ul>
+<li><a class="reference internal" href="#the-type-of-the-gspn-model">The Type of the GSPN Model</a></li>
+<li><a class="reference internal" href="#define-transitions">Define Transitions</a></li>
+<li><a class="reference internal" href="#using-explicittransitionsbuilder">Using ExplicitTransitionsBuilder</a></li>
+<li><a class="reference internal" href="#create-marking-and-state">Create Marking and State</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
-  <p class="topless"><a href="concepts.html"
-                        title="previous chapter">Concepts</a></p>
+  <p class="topless"><a href="mathematics.html"
+                        title="previous chapter">Mathematics of the Semi-Markov Model and GSPN</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="gspntrajectory.html"
                         title="next chapter">Simulating the Trajectory of a Semi-Markov GSPN</a></p>
@@ -230,7 +341,7 @@ for (auto edge : edges)
           <a href="gspntrajectory.html" title="Simulating the Trajectory of a Semi-Markov GSPN"
              >next</a> |</li>
         <li class="right" >
-          <a href="concepts.html" title="Concepts"
+          <a href="mathematics.html" title="Mathematics of the Semi-Markov Model and GSPN"
              >previous</a> |</li>
         <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
       </ul>

@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Observations of the State &mdash; Semi-Markov 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
+    <link rel="next" title="Marking Reference" href="marking.html" />
+    <link rel="prev" title="Simulating the Trajectory of a Semi-Markov GSPN" href="gspntrajectory.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="marking.html" title="Marking Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="gspntrajectory.html" title="Simulating the Trajectory of a Semi-Markov GSPN"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="observations-of-the-state">
+<h1>Observations of the State<a class="headerlink" href="#observations-of-the-state" title="Permalink to this headline">¶</a></h1>
+<p>After each transition, we observe the state of the
+system using the GSPN object and the GSPNState object.</p>
+<dl class="class">
+<dt id="afidd::smv::GSPNState:Marking.UserSate:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">GSPNState&lt;Marking, UserSate&gt;</tt><a class="headerlink" href="#afidd::smv::GSPNState:Marking.UserSate:" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class is the state of the system.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="GSPNState::marking__Marking:Place.Tokens:">
+Marking&lt;Place, Tokens&gt; <tt class="descclassname">GSPNState::</tt><tt class="descname">marking</tt><a class="headerlink" href="#GSPNState::marking__Marking:Place.Tokens:" title="Permalink to this definition">¶</a></dt>
+<dd><p>The marking is saved as a <cite>marking</cite> member. The member function
+<cite>state.marking.modified()</cite> will list which places changed
+during the last transition.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="GSPNState::current_timeC">
+double <tt class="descclassname">GSPNState::</tt><tt class="descname">current_time</tt><big>(</big><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#GSPNState::current_timeC" title="Permalink to this definition">¶</a></dt>
+<dd><p>The absolute time of the system.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="GSPNState::user__UserState">
+UserState <tt class="descclassname">GSPNState::</tt><tt class="descname">user</tt><a class="headerlink" href="#GSPNState::user__UserState" title="Permalink to this definition">¶</a></dt>
+<dd><p>This member is an instance of the class <cite>UserState.</cite></p>
+</dd></dl>
+
+<p>For example, an instance of the following class observes
+when the number of infected individuals within a population
+has passed a given threshold:</p>
+<div class="highlight-python"><pre>template&lt;typename GSPN&gt;
+class SIROutputFunction
+{
+public:
+  typedef void result_type;
+
+private:
+  size_t _pop_cnt;
+  size_t _ind_cnt;
+  size_t _threshold;
+  std::vector&lt;size_t&gt; _infected_per_pop;
+  std::vector&lt;double&gt; _first_passage_time;
+  std::vector&lt;bool&gt; _passed;
+
+public:
+  SIROutputFunction(size_t population_cnt,
+    size_t individuals_per_metapopulation, size_t threshold_for_passage)
+  : _pop_cnt(population_cnt), _ind_cnt(individuals_per_metapopulation),
+    _threshold(threshold_for_passage),
+    _first_passage_time(population_cnt, 0), _passed(population_cnt, false),
+    _infected_per_pop(population_cnt, 0)
+  {
+
+  }
+
+
+
+  result_type operator()(const GSPN&amp; gspn, const SIRState&amp; state)
+  {
+    auto&amp; modified=state.marking.modified();
+    for (auto place_idx : modified)
+    {
+      // Translate the internal place index into the PlaceKey
+      // used to define the GSPN when building the graph.
+      SIRPlace p=gspn.vertex_place(place_idx);
+      if (p.disease==1)
+      {
+        bool filled=(length&lt;0&gt;(state.marking, place_idx)&gt;0);
+        if (filled)
+        {
+          _infected_per_pop[p.metapop]+=1;
+          if (_infected_per_pop[p.metapop]==_threshold)
+          {
+            _first_passage_time[p.metapop]=state.current_time();
+            _passed[p.metapop]=true;
+            BOOST_LOG_TRIVIAL(info)&lt;&lt;&quot;Population &quot;&lt;&lt;p.metapop
+              &lt;&lt;&quot; at time &quot;&lt;&lt;state.current_time();
+          }
+        }
+      }
+    }
+  }
+};</pre>
+</div>
+<p>We use such an object by calling it within the main loop:</p>
+<div class="highlight-python"><pre>size_t transition_cnt=0;
+auto nothing=[](SIRState&amp;)-&gt;void {};
+for ( ;
+  std::get&lt;1&gt;(next)&lt;std::numeric_limits&lt;double&gt;::max();
+  next=propagate_competing_processes(system, nothing, rng))
+{
+  BOOST_LOG_TRIVIAL(debug) &lt;&lt; &quot;trans &quot; &lt;&lt; std::get&lt;0&gt;(next) &lt;&lt; &quot; time &quot; &lt;&lt;
+      std::get&lt;1&gt;(next);
+  ++transition_cnt;
+  output(gspn, state);
+}</pre>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="gspntrajectory.html"
+                        title="previous chapter">Simulating the Trajectory of a Semi-Markov GSPN</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="marking.html"
+                        title="next chapter">Marking Reference</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/observestate.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="marking.html" title="Marking Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="gspntrajectory.html" title="Simulating the Trajectory of a Semi-Markov GSPN"
+             >previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Andrew Dolgert, David Schneider.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

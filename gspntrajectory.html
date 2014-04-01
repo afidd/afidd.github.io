@@ -27,8 +27,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
-    <link rel="next" title="Continuous Distributions" href="distributions.html" />
-    <link rel="prev" title="ExplicitTransitions" href="explicit.html" /> 
+    <link rel="next" title="Observations of the State" href="observestate.html" />
+    <link rel="prev" title="Using ExplicitTransitions to Construct a GSPN" href="explicit.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="distributions.html" title="Continuous Distributions"
+          <a href="observestate.html" title="Observations of the State"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="explicit.html" title="ExplicitTransitions"
+          <a href="explicit.html" title="Using ExplicitTransitions to Construct a GSPN"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
       </ul>
@@ -69,7 +69,17 @@ random number generator.:</p>
 <div class="highlight-python"><pre>template&lt;typename GSPN, typename State, typename Rand&gt;
 class PartialCoreMatrix;</pre>
 </div>
-<p>Given a GSPN, its responsiblity is to present to a propagator
+<p>The partial core matrix has two responsibilities. For the
+underlying GSPN, it enforces the rule, central to this kind
+of semi-Markov model, that distributions of transitions are
+recalculated only when a transition fires which shares marking.
+Sharing markings is the only permitted way to express dependence among
+processes in the system. A distribution may depend arbitrarily
+on external state, such as temperature, but no transition can
+affect the distribution of another transition except by changing
+the marking.</p>
+<p>The partial core matrix also has a responsiblity
+to present to a propagator
 distributions in time of the currently-enabled competing processes.
 The propagator is a function which samples these distributions to
 return the next transition to fire.:</p>
@@ -101,7 +111,6 @@ for ( ;
         &lt;&lt; std::get&lt;1&gt;(next) &lt;&lt; std::endl;
 }</pre>
 </div>
-<p>We have not described here observations on the state.</p>
 </div>
 
 
@@ -112,10 +121,10 @@ for ( ;
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
   <p class="topless"><a href="explicit.html"
-                        title="previous chapter">ExplicitTransitions</a></p>
+                        title="previous chapter">Using ExplicitTransitions to Construct a GSPN</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="distributions.html"
-                        title="next chapter">Continuous Distributions</a></p>
+  <p class="topless"><a href="observestate.html"
+                        title="next chapter">Observations of the State</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/gspntrajectory.txt"
@@ -145,10 +154,10 @@ for ( ;
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="distributions.html" title="Continuous Distributions"
+          <a href="observestate.html" title="Observations of the State"
              >next</a> |</li>
         <li class="right" >
-          <a href="explicit.html" title="ExplicitTransitions"
+          <a href="explicit.html" title="Using ExplicitTransitions to Construct a GSPN"
              >previous</a> |</li>
         <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
       </ul>

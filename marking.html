@@ -1,0 +1,377 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Marking Reference &mdash; Semi-Markov 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
+    <link rel="next" title="Continuous Distributions Reference" href="distributions.html" />
+    <link rel="prev" title="Observations of the State" href="observestate.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="distributions.html" title="Continuous Distributions Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="observestate.html" title="Observations of the State"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="marking-reference">
+<h1>Marking Reference<a class="headerlink" href="#marking-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="local-marking">
+<h2>Local Marking<a class="headerlink" href="#local-marking" title="Permalink to this headline">¶</a></h2>
+<p>The local marking is the set of ways a transition can examine
+or modify the marking of its input and output tokens.
+It is also responsible for keeping track of changes made to the
+marking, so the system can make update affected transitions.
+For this, it collaborates with the complete Marking.</p>
+<div class="section" id="helper-classes">
+<h3>Helper Classes<a class="headerlink" href="#helper-classes" title="Permalink to this headline">¶</a></h3>
+<p>The marking can represent colored tokens in two ways.
+If a place may contain only one type of token, then it is possible
+to create a place in the marking which accepts only one C++ class
+type. We call each of these classes a <em>token layer</em>.
+The more common definition of color is that tokens at
+a marking may be partitioned by a finite set of colors. This is
+called a <em>colored token</em> container.</p>
+<p>Two classes define storage for tokens at a place in a marking.</p>
+<dl class="class">
+<dt id="afidd::smv::Uncolored:TokenType:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">Uncolored&lt;TokenType&gt;</tt><a class="headerlink" href="#afidd::smv::Uncolored:TokenType:" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a storage container for tokens of the same type and
+without color.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="afidd::smv::color_type:TokenType:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">color_type&lt;TokenType&gt;</tt><a class="headerlink" href="#afidd::smv::color_type:TokenType:" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an arbitrary token, this decares the type of its color.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="localmarking-class">
+<h3>LocalMarking Class<a class="headerlink" href="#localmarking-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="afidd::smv::LocalMarking:typename-...-TokenContainers:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">LocalMarking&lt;typename ... TokenContainers&gt;</tt><a class="headerlink" href="#afidd::smv::LocalMarking:typename-...-TokenContainers:" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class is responsible for reading and changing the subset
+of the marking associated with the input places and output
+places of a transition. The Marking for the whole system
+puts values into this class and checks it to see what changes
+have been made.</p>
+<p>The template argument is a list of token containers. For example:</p>
+<div class="highlight-python"><pre>typedef LocalMarking&lt;Uncolored&lt;CowToken&gt;,Uncolored&lt;BatToken&gt;&gt; MyLocal;</pre>
+</div>
+<p>With
+this definition, the <cite>CowToken</cite> is layer 0 and the <cite>BatToken</cite>
+is layer 1.</p>
+<p>All methods in this class refer to token containers with an
+ordinal <cite>size_t</cite>. This is exactly the order used when defining
+the transition in <cite>BuildGraph</cite>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::LocalMarking">
+ <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">LocalMarking</tt><big>(</big><big>)</big><a class="headerlink" href="#afidd::smv::LocalMarking::LocalMarking" title="Permalink to this definition">¶</a></dt>
+<dd><p>There is a default constructor.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::add:I:__s.TokenType:I:CR">
+ <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">add&lt;I&gt;</tt><big>(</big>size_t <em>place_idx</em>, const TokenType&lt;I&gt;&amp; <em>token</em><big>)</big><a class="headerlink" href="#afidd::smv::LocalMarking::add:I:__s.TokenType:I:CR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a token to a place. The template argument is a size_t which
+specifies the token layer.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::remove:I.RNG:__s.s.RNGR">
+ <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">remove&lt;I, RNG&gt;</tt><big>(</big>size_t <em>place_idx</em>, size_t <em>count</em>, RNG&amp; <em>random_generator</em><big>)</big><a class="headerlink" href="#afidd::smv::LocalMarking::remove:I.RNG:__s.s.RNGR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove <cite>count</cite> tokens from a place. This version chooses the tokens
+randomly using a random number generator of the kind defined in
+std::random and Boost.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::length:I:__sC">
+size_t <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">length&lt;I&gt;</tt><big>(</big>size_t <em>place_idx</em><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#afidd::smv::LocalMarking::length:I:__sC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of tokens.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::stochiometric_coefficient__sC">
+int <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">stochiometric_coefficient</tt><big>(</big>size_t <em>place_idx</em><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#afidd::smv::LocalMarking::stochiometric_coefficient__sC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the stochiometric coefficient associated with this place, for
+this transition.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::layer__sC">
+ <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">layer</tt><big>(</big>size_t <em>place_idx</em><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#afidd::smv::LocalMarking::layer__sC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the token layer for this place.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::get:I.F:__s.FCRC">
+std::tuple&lt;F::result_type, bool&gt; <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">get&lt;I, F&gt;</tt><big>(</big>size_t <em>place_idx</em>, const F&amp; <em>functor</em><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#afidd::smv::LocalMarking::get:I.F:__s.FCRC" title="Permalink to this definition">¶</a></dt>
+<dd><p>This doesn&#8217;t get a token. It operates on the container with a functor of
+type <cite>F</cite> and returns the result of that functor. For instance, you might
+want to know the average of the <cite>birthday</cite> property of a set of tokens
+on the second input arc of a transition:</p>
+<div class="highlight-python"><pre>auto average=local_marking.template get&lt;0&gt;(1,
+  [](const Uncolored&lt;Children&gt;&amp; kids)-&gt;double {
+      double total=0.0;
+      for (const auto&amp; k : kids) {
+          total+=k.birthday;
+      }
+      return total/kids.size();
+  });</pre>
+</div>
+<p>The <cite>get</cite> function returns a <cite>std::tuple&lt;double,bool&gt;</cite>, where the first
+type is the return type of your function and the second is whether
+there were any tokens at the place.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::get_token:I.F:__s.FCRC">
+ <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">get_token&lt;I, F&gt;</tt><big>(</big>size_t <em>place_idx</em>, const F&amp; <em>functor</em><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#afidd::smv::LocalMarking::get_token:I.F:__s.FCRC" title="Permalink to this definition">¶</a></dt>
+<dd><p>This applied <cite>functor</cite> to the token at layer I, and returns an
+<cite>std::tuple&lt;F::result_type,bool&gt;</cite> where the first member of the tuple
+is the result type of the functor, <cite>F</cite>, and the second is whether there
+were any tokens at the place. It runs the functor on the <em>first</em> token
+in the container.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::move:I.J:__s.s.s">
+ <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">move&lt;I, J&gt;</tt><big>(</big>size_t <em>from</em>, size_t <em>to</em>, size_t <em>count</em><big>)</big><a class="headerlink" href="#afidd::smv::LocalMarking::move:I.J:__s.s.s" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves a token from one place to another. The two layers, I and J, are
+usually the same, but it is possible to move a token from one layer
+to another if the token types are the same for both layers. For instance,
+one may be colored an one uncolored.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::move:I.J.Modifier:__s.s.s.ModifierCR">
+ <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">move&lt;I, J, Modifier&gt;</tt><big>(</big>size_t <em>from</em>, size_t <em>to</em>, size_t <em>count</em>, const Modifier&amp; <em>functor</em><big>)</big><a class="headerlink" href="#afidd::smv::LocalMarking::move:I.J.Modifier:__s.s.s.ModifierCR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This moves <cite>count</cite> number of tokens from a place in the Ith token layer
+to a place in the Jth token layer (usually the same layer), and applies
+the function <cite>functor</cite> to each token. For example:</p>
+<div class="highlight-python"><pre>local_marking.template move&lt;0,0&gt;(1, 3, 1,
+  [](CowToken&amp; bessie)-&gt;void {
+    bessie.parity+=1; // The number of times the cow gave birth.
+  });</pre>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::input_tokens_sufficient:I:C">
+bool <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">input_tokens_sufficient&lt;I&gt;</tt><big>(</big><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#afidd::smv::LocalMarking::input_tokens_sufficient:I:C" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asks whether the number of tokens at each input place exceeds the
+requirements of the stochiometric coefficients to that place.
+This determines whether a transition is enabled.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::outputs_tokens_empty:I:C">
+bool <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">outputs_tokens_empty&lt;I&gt;</tt><big>(</big><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#afidd::smv::LocalMarking::outputs_tokens_empty:I:C" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asks whether all output places are empty. A transition can have a policy
+that it will not enable unless output places have no tokens.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::transfer_by_stochiometric_coefficient:I.RNG:__RNGR">
+void <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">transfer_by_stochiometric_coefficient&lt;I, RNG&gt;</tt><big>(</big>RNG&amp; <em>random_generator</em><big>)</big><a class="headerlink" href="#afidd::smv::LocalMarking::transfer_by_stochiometric_coefficient:I.RNG:__RNGR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This high level function looks at the stochiometric coefficient of each
+input and output arc for all tokens at layer I. It then moves tokens
+from inputs to outputs. If
+inputs have more than one token, they are chosen randomly, and input
+tokens are randomly assigned to outputs. Any extra inputs are removed
+and any extra outputs are created.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::LocalMarking::transfer_by_stochiometric_coefficient:I.RNG.AndModify:__RNGR.AndModifyCR">
+void <tt class="descclassname">afidd::smv::LocalMarking::</tt><tt class="descname">transfer_by_stochiometric_coefficient&lt;I, RNG, AndModify&gt;</tt><big>(</big>RNG&amp; <em>random_generator</em>, const AndModify&amp; <em>mod</em><big>)</big><a class="headerlink" href="#afidd::smv::LocalMarking::transfer_by_stochiometric_coefficient:I.RNG.AndModify:__RNGR.AndModifyCR" title="Permalink to this definition">¶</a></dt>
+<dd><p>As above, this moves tokens according to the stochiometric coefficients, but
+it also executes the AndModify functor on each token.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="marking-class">
+<h2>Marking Class<a class="headerlink" href="#marking-class" title="Permalink to this headline">¶</a></h2>
+<p>The Marking class is much like the LocalMarking, but it specifies
+places using a PlaceKey.</p>
+<dl class="class">
+<dt>
+<tt class="descname">afidd::smv::Marking&lt;PlaceKey,typepname... TokenContainers&gt;</tt></dt>
+<dd><p>This class holds the marking for the whole system. Each place
+can contain one type of token container, specified by the
+list of TokenContainers.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::Marking::Marking">
+ <tt class="descclassname">afidd::smv::Marking::</tt><tt class="descname">Marking</tt><big>(</big><big>)</big><a class="headerlink" href="#afidd::smv::Marking::Marking" title="Permalink to this definition">¶</a></dt>
+<dd><p>The constructor takes no arguments.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::Marking::modified">
+ <tt class="descclassname">afidd::smv::Marking::</tt><tt class="descname">modified</tt><big>(</big><big>)</big><a class="headerlink" href="#afidd::smv::Marking::modified" title="Permalink to this definition">¶</a></dt>
+<dd><p>This returns the set of PlaceKeys of places whose tokens
+were modified in any way.</p>
+</dd></dl>
+
+<p><strong>Free Functions</strong></p>
+<dl class="function">
+<dt id="afidd::smv::add:I.Marking:__MarkingR.PlaceKey.TokenType:I:CR">
+void <tt class="descclassname">afidd::smv::</tt><tt class="descname">add&lt;I, Marking&gt;</tt><big>(</big>Marking&amp; <em>m</em>, PlaceKey <em>place</em>, const TokenType&lt;I&gt;&amp; <em>token</em><big>)</big><a class="headerlink" href="#afidd::smv::add:I.Marking:__MarkingR.PlaceKey.TokenType:I:CR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a token to the container at a place. The size_t constant <cite>I</cite> specifies
+the layer. This is a free function.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::remove:I.Marking.RNG:__MarkingR.PlaceKey.s.RNGR">
+void <tt class="descclassname">afidd::smv::</tt><tt class="descname">remove&lt;I, Marking, RNG&gt;</tt><big>(</big>Marking&amp; <em>m</em>, PlaceKey <em>place</em>, size_t <em>cnt</em>, RNG&amp; <em>rng</em><big>)</big><a class="headerlink" href="#afidd::smv::remove:I.Marking.RNG:__MarkingR.PlaceKey.s.RNGR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove <cite>cnt</cite> number of tokens from the marking at <cite>place</cite> in layer <cite>I.</cite>
+If there are more than <cite>cnt</cite> tokens at the place, then this uses the random
+number generator, <cite>rng,</cite> to select tokens.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::length:I.Marking:__MarkingR.PlaceKey">
+size_t <tt class="descclassname">afidd::smv::</tt><tt class="descname">length&lt;I, Marking&gt;</tt><big>(</big>Marking&amp; <em>m</em>, PlaceKey <em>place</em><big>)</big><a class="headerlink" href="#afidd::smv::length:I.Marking:__MarkingR.PlaceKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of tokens at a place.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::get:I.Marking.F:__MarkingCR.PlaceKey.FCR">
+std::tuple&lt;F::result_type, bool&gt; <tt class="descclassname">afidd::smv::</tt><tt class="descname">get&lt;I, Marking, F&gt;</tt><big>(</big>const Marking&amp; <em>m</em>, PlaceKey <em>place</em>, const F&amp; <em>functor</em><big>)</big><a class="headerlink" href="#afidd::smv::get:I.Marking.F:__MarkingCR.PlaceKey.FCR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a functor to the first token at <cite>place.</cite> Return a tuple with
+a) whether there was any token at the place and b) the result of the functor
+if there was.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::move:I.J.Marking:__MarkingCR.PlaceKey.PlaceKey.s">
+void <tt class="descclassname">afidd::smv::</tt><tt class="descname">move&lt;I, J, Marking&gt;</tt><big>(</big>const Marking&amp; <em>m</em>, PlaceKey <em>place_from</em>, PlaceKey <em>place_to</em>, size_t <em>count</em><big>)</big><a class="headerlink" href="#afidd::smv::move:I.J.Marking:__MarkingCR.PlaceKey.PlaceKey.s" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move <cite>count</cite> number of tokens from <cite>place_from</cite> in layer
+<cite>I</cite> to <cite>place_to</cite> in layer <cite>J</cite>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::move:I.J.Marking.Modifier:__MarkingCR.PlaceKey.PlaceKey.s.ModifierCR">
+void <tt class="descclassname">afidd::smv::</tt><tt class="descname">move&lt;I, J, Marking, Modifier&gt;</tt><big>(</big>const Marking&amp; <em>m</em>, PlaceKey <em>place_from</em>, PlaceKey <em>place_to</em>, size_t <em>count</em>, const Modifier&amp; <em>modify</em><big>)</big><a class="headerlink" href="#afidd::smv::move:I.J.Marking.Modifier:__MarkingCR.PlaceKey.PlaceKey.s.ModifierCR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move <cite>count</cite> number of tokens from <cite>place_from</cite> in layer
+<cite>I</cite> to <cite>place_to</cite> in layer <cite>J</cite>. Additionally apply the functor <cite>modify</cite>
+to each moved token.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Marking Reference</a><ul>
+<li><a class="reference internal" href="#local-marking">Local Marking</a><ul>
+<li><a class="reference internal" href="#helper-classes">Helper Classes</a></li>
+<li><a class="reference internal" href="#localmarking-class">LocalMarking Class</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#marking-class">Marking Class</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="observestate.html"
+                        title="previous chapter">Observations of the State</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="distributions.html"
+                        title="next chapter">Continuous Distributions Reference</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/marking.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="distributions.html" title="Continuous Distributions Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="observestate.html" title="Observations of the State"
+             >previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Andrew Dolgert, David Schneider.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

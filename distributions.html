@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Continuous Distributions &mdash; Semi-Markov 1.0 documentation</title>
+    <title>Continuous Distributions Reference &mdash; Semi-Markov 1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
-    <link rel="prev" title="Simulating the Trajectory of a Semi-Markov GSPN" href="gspntrajectory.html" /> 
+    <link rel="prev" title="Marking Reference" href="marking.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="gspntrajectory.html" title="Simulating the Trajectory of a Semi-Markov GSPN"
+          <a href="marking.html" title="Marking Reference"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
       </ul>
@@ -48,8 +48,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="continuous-distributions">
-<h1>Continuous Distributions<a class="headerlink" href="#continuous-distributions" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="continuous-distributions-reference">
+<h1>Continuous Distributions Reference<a class="headerlink" href="#continuous-distributions-reference" title="Permalink to this headline">¶</a></h1>
 <p>The core matrix of a semi-Markov system is defined on a joint
 discrete and continuous space, where the discrete set is of
 next possible states of the system and the continuous space
@@ -63,30 +63,127 @@ first becomes enabled by the marking, it chooses the distribution
 of firing times. At any later time when a different, independent,
 transition has fired without affecting the first, the first&#8217;s
 distribution doesn&#8217;t change. It just gets renormalized to account
-for knowledge that it has not yet fired. This renormalization
-is apparently less common, because it is not in the API of
-Boost::Random or std::random.</p>
+for knowledge that it has not yet fired. If we label the
+cumulative distribution by <span class="math">\(F(t)\)</span> and a distribution is shifted
+by a time <span class="math">\(\Delta=t_0-t_e\)</span>, then the new distribution is
+sampled with a shifted quantile. If we know the original cumulative
+distribution function, <span class="math">\(F(t,t_e),\)</span> where <span class="math">\(t_e\)</span> is the
+enabling time of the distribution function, then we can calulate
+the distribution, <em>given that it hasn&#8217;t fired before time</em> <span class="math">\(t_0\)</span>,
+with</p>
+<div class="math">
+\[F(t, t_0, t_e)=\frac{F(t,t_e)-F(t_0,t_e)}{1-F(t_0,t_e)}\]</div>
+<p>This makes the calculation of the quantile, using the original
+quantile, <span class="math">\(F^{-1},\)</span> look like</p>
+<div class="math">
+\[t-t_0=Q(U,\Delta)=F^{-1}(U(1-F(\Delta))+F(\Delta))-\Delta.\]</div>
+<p>Given any distributions from Boost::Random or std::random, this
+formula calculates the shifted quantile from the original quantile
+and cumulative distribution.</p>
 <p>Transitions for this library implement the following interface.:</p>
-<div class="highlight-python"><pre>template&lt;typename RNG&gt;
+<div class="highlight-python"><pre>template&lt;typename RandomGenerator&gt;
 class TransitionDistribution
 {
 public:
-    virtual double sample(double enabling_time, double current_time, RNG&amp; rng);
+    virtual double sample(double current_time, RandomGenerator&amp; rng);
 };</pre>
 </div>
-<p>Each sample can be taken from the difference between the two times,
+<p>The template argument RandomGenerator fulfills the concept of the Boost
+random number generator concept and the std::random random number
+generator concept.
+Each sample can be taken from the difference between the two times,
 <span class="math">\((t_c-t_e)\)</span>, but passing both separately will be better for vectorization
 of sampling.</p>
 <p>The following distributions are currently in the library.</p>
-<p><strong>NoDistribution</strong>
-This has no parameters and always returns infinity.</p>
-<p><strong>ExponentialDistribution</strong> This is the classic Markovian distribution.</p>
-<p><strong>BoostDistribution</strong> This takes any Boost distribution and converts it
-to account for the renormalization of a time shift.</p>
+<dl class="class">
+<dt id="afidd::smv::ExponentialDistribution:RandomNumberGenerator:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">ExponentialDistribution&lt;RandomNumberGenerator&gt;</tt><a class="headerlink" href="#afidd::smv::ExponentialDistribution:RandomNumberGenerator:" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference external" href="http://en.wikipedia.org/wiki/Exponential_distribution">exponential distribution</a>
+is the classic Markovian distribution. The cumulative
+distribution and quantile are defined as the following.</p>
+</dd></dl>
+
 <div class="math">
-\[quantile(distribution, 1-(1-rand(rng))/normal)
-*(1-cdf(distribution, t_c-t_e))-(t_c-t_e)\]</div>
-<p>This transformation accounts for the time shifting.</p>
+\[F(x) = 1-e^{-λx}\]\[Q(x) = -(1/\lambda)\ln(1-x)\]\[Q(x,\Delta)=Q(x)\]</div>
+<dl class="function">
+<dt id="afidd::smv::ExponentialDistribution::ExponentialDistribution__double.double">
+ <tt class="descclassname">afidd::smv::ExponentialDistribution::</tt><tt class="descname">ExponentialDistribution</tt><big>(</big>double <em>lambda</em>, double <em>enabling_time</em><big>)</big><a class="headerlink" href="#afidd::smv::ExponentialDistribution::ExponentialDistribution__double.double" title="Permalink to this definition">¶</a></dt>
+<dd><p>The constructor takes the parameter <cite>lambda,</cite> an enabling time for the
+distribution as an absolute system time.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="afidd::smv::ShiftedExponentialDistribution:RandomNumberGenerator:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">ShiftedExponentialDistribution&lt;RandomNumberGenerator&gt;</tt><a class="headerlink" href="#afidd::smv::ShiftedExponentialDistribution:RandomNumberGenerator:" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference external" href="http://en.wikipedia.org/wiki/Exponential_distribution">exponential distribution</a>
+is the classic Markovian distribution.
+The shift is a displacement
+of the cumulative distribution function by an amount <span class="math">\(t_s.\)</span></p>
+</dd></dl>
+
+<div class="math">
+\[F(x) = 1-e^{-λ(x-t_s)}\]</div>
+<dl class="function">
+<dt id="afidd::smv::ShiftedExponentialDistribution::ExponentialDistribution__double.double.double.double">
+ <tt class="descclassname">afidd::smv::ShiftedExponentialDistribution::</tt><tt class="descname">ExponentialDistribution</tt><big>(</big>double <em>lambda</em>, double <em>enabling_time</em>, double <em>shift</em><em>=0.0</em>, double <em>normal</em><em>=1.0</em><big>)</big><a class="headerlink" href="#afidd::smv::ShiftedExponentialDistribution::ExponentialDistribution__double.double.double.double" title="Permalink to this definition">¶</a></dt>
+<dd><p>The constructor takes the parameter <cite>lambda,</cite> an enabling time for the
+distribution as an absolute system time, and a normalization constant.
+If <cite>normal</cite> is less than one, it represents the probability that
+this distribution will fire at all.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="afidd::smv::WeibullDistribution:RandomNumberGenerator:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">WeibullDistribution&lt;RandomNumberGenerator&gt;</tt><a class="headerlink" href="#afidd::smv::WeibullDistribution:RandomNumberGenerator:" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="http://en.wikipedia.org/wiki/Weibull_distribution">Weibull distributions</a> can model either infant mortality or aging processes. Parameters
+may be defined different ways. This class uses the following
+cumulative distribution and quantile.</p>
+</dd></dl>
+
+<div class="math">
+\[F(x)=1-e^{-\left(x/\lambda\right)^k}\]\[Q(p; k,\lambda)=\lambda\left[-\ln(1-p)\right]^{1/k}\]\[Q(p,\Delta; k,\lambda)=\lambda\left[-\ln(1-p)+\left(\Delta/\lambda\right)^k\right]^{1/k}-\Delta\]</div>
+<dl class="function">
+<dt id="afidd::smv::WeibullDistribution::WeibullDistribution__double.double.double.double.double">
+ <tt class="descclassname">afidd::smv::WeibullDistribution::</tt><tt class="descname">WeibullDistribution</tt><big>(</big>double <em>lambda</em>, double <em>k</em>, double <em>enabling_time</em>, double <em>shift</em>, double <em>normal</em><em>=1.0</em><big>)</big><a class="headerlink" href="#afidd::smv::WeibullDistribution::WeibullDistribution__double.double.double.double.double" title="Permalink to this definition">¶</a></dt>
+<dd><p>This creates a Weibull distribution with parameters as defined above.
+The shift moves the distribution to the right.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="afidd::smv::GammaDistribution:RandomNumberGenerator:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">GammaDistribution&lt;RandomNumberGenerator&gt;</tt><a class="headerlink" href="#afidd::smv::GammaDistribution:RandomNumberGenerator:" title="Permalink to this definition">¶</a></dt>
+<dd><p>This uses the Boost::Math::gamma_distribution.
+It has two parameters, shape and scale.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::GammaDistribution::GammaDistribution__double.double.double.double.double">
+ <tt class="descclassname">afidd::smv::GammaDistribution::</tt><tt class="descname">GammaDistribution</tt><big>(</big>double <em>alpha</em>, double <em>theta</em>, double <em>enabling_time</em>, double <em>shift</em><em>=0.0</em>, double <em>normal</em><em>=1.0</em><big>)</big><a class="headerlink" href="#afidd::smv::GammaDistribution::GammaDistribution__double.double.double.double.double" title="Permalink to this definition">¶</a></dt>
+<dd><p>The constructor initializes the two parameters, <span class="math">\(\alpha\)</span> and <span class="math">\(\theta.\)</span> It also sets the enabling time and optional shift and normal.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="afidd::smv::PiecewiseLinearDistribution:RandomNumberGenerator:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">PiecewiseLinearDistribution&lt;RandomNumberGenerator&gt;</tt><a class="headerlink" href="#afidd::smv::PiecewiseLinearDistribution:RandomNumberGenerator:" title="Permalink to this definition">¶</a></dt>
+<dd><p>This distribution represents piecewise, linear, continuous distributions.
+It is an expansion on the <cite>std::piecewise_linear_distribution</cite> from
+the <cite>std::random</cite> header. The piecewise curve defines an un-normalized
+probability density function, from which the cumulative distribution
+function is calculated.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="afidd::smv::PiecewiseLinearDistribution::PiecewiseLinearDistribution__std::vector:double:CR.std::vector:double:CR.double.double.double">
+ <tt class="descclassname">afidd::smv::PiecewiseLinearDistribution::</tt><tt class="descname">PiecewiseLinearDistribution</tt><big>(</big>const std::vector&lt;double&gt;&amp; <em>b</em>, const std::vector&lt;double&gt;&amp; <em>w</em>, double <em>enabling_time</em>, double <em>shift</em><em>=0.0</em>, double <em>normal</em><em>=1.0</em><big>)</big><a class="headerlink" href="#afidd::smv::PiecewiseLinearDistribution::PiecewiseLinearDistribution__std::vector:double:CR.std::vector:double:CR.double.double.double" title="Permalink to this definition">¶</a></dt>
+<dd><p>The vector <cite>b</cite> specifies intercepts on the x-axis. The domain of the
+probability distribution function is from the first to last value of
+<cite>b</cite>. The weight vector, <cite>w,</cite> is the height of the unnormalized
+function at each point <cite>b.</cite> The arrays <cite>b</cite> and <cite>w</cite> must have at
+least two points and must be the same length.
+The <cite>shift</cite> moves the whole distribution to the right. <cite>normal</cite>
+is the probability that this distribution will fire at all.</p>
+</dd></dl>
+
 </div>
 
 
@@ -96,8 +193,8 @@ to account for the renormalization of a time shift.</p>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="gspntrajectory.html"
-                        title="previous chapter">Simulating the Trajectory of a Semi-Markov GSPN</a></p>
+  <p class="topless"><a href="marking.html"
+                        title="previous chapter">Marking Reference</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/distributions.txt"
@@ -127,7 +224,7 @@ to account for the renormalization of a time shift.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="gspntrajectory.html" title="Simulating the Trajectory of a Semi-Markov GSPN"
+          <a href="marking.html" title="Marking Reference"
              >previous</a> |</li>
         <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
       </ul>
