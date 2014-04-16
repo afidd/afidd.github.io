@@ -83,6 +83,12 @@ external data, such as weather.</li>
 generator for everything. This class supports the C++
 <tt class="docutils literal"><span class="pre">random</span></tt> requirements.</li>
 </ul>
+<p>Because the library offers choices in how to define the pieces,
+it will be necessary to build the GSPN and the its dynamics
+in steps. There are natural dependencies among the pieces,
+defined by what each entity is</p>
+<a class="reference internal image-reference" href="_images/type_dependency.svg"><div align="center" class="align-center"><img alt="First define PlaceKey, TransitionKey, and the Token. Last to define is the StochasticDynamics." src="_images/type_dependency.svg" /></div>
+</a>
 <p>An example of a <tt class="docutils literal"><span class="pre">PlaceKey</span></tt> from an SIR model shows that defining
 such a struct is verbose but painless:</p>
 <div class="highlight-python"><pre>struct SIRPlace
@@ -144,7 +150,7 @@ using Dist=TransitionDistribution&lt;RandGen&gt;;
 class InfectNeighbor : public Transition
 {
   virtual std::pair&lt;bool, std::unique_ptr&lt;Dist&gt;&gt;
-  enabled(const UserState&amp; s, const Local&amp; local_marking,
+  Enabled(const UserState&amp; s, const Local&amp; local_marking,
           double te, double t0) const override
   {
     if (local_marking.template input_tokens_sufficient&lt;0&gt;())
@@ -158,14 +164,14 @@ class InfectNeighbor : public Transition
     }
   }
 
-  virtual void fire(UserState&amp; s, Local&amp; local_marking,
+  virtual void Fire(UserState&amp; s, Local&amp; local_marking,
                     RandGen&amp; rng) const override
   {
     local_marking.template transfer_by_stochiometric_coefficient&lt;0&gt;(rng);
   }
 };</pre>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">enabled()</span></tt> method&#8217;s parameters are</p>
+<p>The <tt class="docutils literal"><span class="pre">Enabled()</span></tt> method&#8217;s parameters are</p>
 <ul class="simple">
 <li><strong>UserState</strong> - This is the same as specified above. It could
 include parameters or a pointer to inhomogeneous drivers of the system.</li>
@@ -195,11 +201,11 @@ object. The builder has just three methods, <cite>add_place()</cite>,
 have, as inputs and outputs, places which exist. It ensures
 every PlaceKey and TransitionKey is unique. The signatures
 of its methods:</p>
-<div class="highlight-python"><pre>void BuildGraph::add_place(const PlaceKey&amp;, size_t token_layer);
+<div class="highlight-python"><pre>void BuildGraph::AddPlace(const PlaceKey&amp;, size_t token_layer);
 
 typedef std::tuple&lt;PlaceKey,int&gt; BuildGraph::PlaceEdge;
 
-void BuildGraph::add_transition(const TransitionKey&amp;,
+void BuildGraph::AddTransition(const TransitionKey&amp;,
     const std::vector&lt;BuildGraph::PlaceEdge&gt;&amp;,
     std::unique_ptr&lt;ExplicitTransition&lt;&lt;Local,RandGen,WithParams&gt;);</pre>
 </div>
@@ -220,13 +226,13 @@ build_system(size_t individual_cnt)
   {
     for (size_t place : std::vector&lt;int&gt;{s, i, r})
     {
-      bg.add_place({place, ind_idx}, 0);
+      bg.AddPlace({place, ind_idx}, 0);
     }
   }
 
   for (size_t left_idx=0; left_idx&lt;individual_cnt-1; left_idx++)
   {
-    bg.add_transition({left_idx, left_idx, 0},
+    bg.AddTransition({left_idx, left_idx, 0},
       {Edge{{i, left_idx}, -1}, Edge{{r, left_idx}, 1}},
       std::unique_ptr&lt;SIRTransition&gt;(new Recover())
       );
@@ -237,7 +243,7 @@ build_system(size_t individual_cnt)
       SIRPlace rights{s, right_idx};
       SIRPlace righti{i, right_idx};
 
-      bg.add_transition({left_idx, right_idx, 0},
+      bg.AddTransition({left_idx, right_idx, 0},
         {Edge{left, -1}, Edge{rights, -1}, Edge{left, 1}, Edge{righti, 1}},
         std::unique_ptr&lt;SIRTransition&gt;(new InfectNeighbor()));
 
@@ -245,7 +251,7 @@ build_system(size_t individual_cnt)
       SIRPlace lefti{i, left_idx};
       SIRPlace right{i, right_idx};
 
-      bg.add_transition({right_idx, left_idx, 0},
+      bg.AddTransition({right_idx, left_idx, 0},
         {Edge{right, -1}, Edge{lefts, -1}, Edge{right, 1}, Edge{lefti, 1}},
         std::unique_ptr&lt;SIRTransition&gt;(new InfectNeighbor()));
     }
@@ -265,7 +271,7 @@ class uses a different place and transition key internally,
 chosen by the Boost Graph Library implementation. Both are
 just type <cite>size_t</cite>. The marking and state are therefore:</p>
 <div class="highlight-python"><pre>using Mark=Marking&lt;size_t, Uncolored&lt;IndividualToken&gt;&gt;;
-using State=GSPNState&lt;Mark,UserState&gt;;
+using State=GSPNState&lt;Mark,TransitionKey,UserState&gt;;
 
 State state;</pre>
 </div>
@@ -274,7 +280,7 @@ it as <cite>state.user.parameters</cite>.</p>
 <p>How do we initialize the marking? Unfortunately, the marking doesn&#8217;t
 use our <cite>PlaceKey</cite>, so we have to add a translation step from
 the <cite>PlaceKey</cite> we know to the <cite>size_t</cite> we don&#8217;t:</p>
-<div class="highlight-python"><pre>size_t susceptible=gspn.place_vertex(
+<div class="highlight-python"><pre>size_t susceptible=gspn.PlaceVertex(
     PlaceKey{Disease::Susceptible, individual_idx});
 add&lt;0&gt;(state.marking, susceptible, IndividualToken{});</pre>
 </div>

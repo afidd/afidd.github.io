@@ -80,14 +80,54 @@ quantile, <span class="math">\(F^{-1},\)</span> look like</p>
 <p>Given any distributions from Boost::Random or std::random, this
 formula calculates the shifted quantile from the original quantile
 and cumulative distribution.</p>
-<p>Transitions for this library implement the following interface.:</p>
-<div class="highlight-python"><pre>template&lt;typename RandomGenerator&gt;
-class TransitionDistribution
-{
-public:
-    virtual double sample(double current_time, RandomGenerator&amp; rng);
-};</pre>
-</div>
+<p>Transitions for this library implement the following interface.</p>
+<dl class="class">
+<dt id="afidd::smv::TransitionDistribution:RandomGenerator:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">TransitionDistribution&lt;RandomGenerator&gt;</tt><a class="headerlink" href="#afidd::smv::TransitionDistribution:RandomGenerator:" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the pure virtual base class for distributions.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Sample__double.RandomGeneratorRC">
+double <tt class="descname">Sample</tt><big>(</big>double <em>current_time</em>, RandomGenerator&amp; <em>rng</em><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#Sample__double.RandomGeneratorRC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a sample from the random variable in absolute time
+after the given current time.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="EnablingTimeC">
+double <tt class="descname">EnablingTime</tt><big>(</big><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#EnablingTimeC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Each distribution remembers its enabling time in absolute time
+since the start of the simulation.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="BoundedHazardC">
+bool <tt class="descname">BoundedHazard</tt><big>(</big><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#BoundedHazardC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Some distributions have a hazard function, defined as the ratio
+of the probability density to the survival, which is bounded for
+finite times. These functions will have a well-defined hazard
+integral. This method tells the caller whether the hazard integral
+is a reasonable approach to sample the distribution.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="HazardIntegral__double.doubleC">
+double <tt class="descname">HazardIntegral</tt><big>(</big>double <em>t0</em>, double <em>t1</em><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#HazardIntegral__double.doubleC" title="Permalink to this definition">¶</a></dt>
+<dd><p>This returns the integral of the hazard between absolute time
+<span class="math">\(t_0\)</span> and <span class="math">\(t_1\)</span>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ImplicitHazardIntegral__double.doubleC">
+double <tt class="descname">ImplicitHazardIntegral</tt><big>(</big>double <em>xa</em>, double <em>t0</em><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#ImplicitHazardIntegral__double.doubleC" title="Permalink to this definition">¶</a></dt>
+<dd><p>This implicitly solves for a quantile by integrating the hazard.
+For certain distributions, this is analytic. The function returns
+<span class="math">\(t\)</span> in</p>
+</dd></dl>
+
+<div class="math">
+\[x_a=\int_{t_0}^{t} \lambda(s) ds.\]</div>
 <p>The template argument RandomGenerator fulfills the concept of the Boost
 random number generator concept and the std::random random number
 generator concept.

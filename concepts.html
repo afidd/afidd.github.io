@@ -52,17 +52,8 @@
 among places and transitions which define a semi-Markov system.
 The C++ concept of a GSPN first identifies the type of the
 identifiers for places and for transitions.:</p>
-<div class="highlight-python"><pre>template&lt;typename GSPN&gt;
-struct petri_place
-{
-  typedef void type;
-};
-
-template&lt;typename GSPN&gt;
-struct petri_transition
-{
-  typedef void type;
-};</pre>
+<div class="highlight-python"><pre>typedef undefined PlaceKey;
+typedef undefined TransitionKey;</pre>
 </div>
 <p>Then there are two functions that express which transitions depend on
 which places. The first retrieves that part of the GSPN relevant to a
@@ -71,14 +62,14 @@ stochiometric coefficients associated with those edges, and the type of
 token expected at each place. The second function calls a unary function
 on each transition which relates to any of a given set of places.:</p>
 <div class="highlight-python"><pre>template&lt;typename GSPN&gt;
-std::vector&lt;std::tuple&lt;place_t&lt;GSPN&gt;,int,size_t&gt;&gt;
-neighbors_of_transition(const GSPN&amp; g, trans_t&lt;GSPN&gt; transition_id);
+std::vector&lt;std::tuple&lt;PlaceKey,int,int&gt;&gt;
+NeighborsOfTransition(const GSPN&amp; g, TransitionKey transition_id);
 
 
 auto func=[] (trans_t&lt;GSPN&gt; neighbor_id)-&gt;void;
 
 template&lt;typename GSPN, typename Functor&gt;
-void neighbors_of_places(const GSPN&amp; g, const std::set&lt;place_t&lt;GSPN&gt;&gt;&amp; place_id,
+void NeighborsOfPlaces(const GSPN&amp; g, const std::set&lt;PlaceKey&gt;&amp; place_id,
               Functor func);</pre>
 </div>
 <p>Together, these two functions determine which transitions can affect or be
@@ -92,13 +83,14 @@ only by its transition id and its distribution. The <tt class="docutils literal"
 checks the local marking to see whether a transition is enabled and,
 if so, returns the distribution associated with that transition. The
 Distribution object doesn&#8217;t depend on the local marking.:</p>
-<div class="highlight-python"><pre>template&lt;typename GSPN, typename State, typename LocalMarking&gt;
+<div class="highlight-python"><pre>template&lt;typename GSPN, typename UserState, typename LocalMarking&gt;
 std::tuple&lt;bool,Distribution&gt;
-enabled(const GSPN&amp;, const State&amp;, const LocalMarking&amp;);</pre>
+Enabled(const GSPN&amp;, const UserState&amp;, const LocalMarking&amp;,
+    double enabling_time, double current_time);</pre>
 </div>
 <p>The firing of a transition is the last part of the GSPN concept.:</p>
 <div class="highlight-python"><pre>template&lt;typename GSPN, typename State, typename LocalMarking, typename RNG&gt;
-void fire(const GSPN&amp;, State&amp;, LocalMarking&amp;, RNG&amp;);</pre>
+void Fire(const GSPN&amp;, UserState&amp;, LocalMarking&amp;, RNG&amp;);</pre>
 </div>
 <p>The random number generator is necessary because firing may select
 a random token from the marking at a place.</p>
@@ -126,38 +118,38 @@ public:
 };
 
 template&lt;typename LAYER&gt;
-void add(Marking&amp;, place_t&lt;GSPN&gt;, token_t&lt;Marking,LAYER&gt;);
+void Add(Marking&amp;, place_t&lt;GSPN&gt;, token_t&lt;Marking,LAYER&gt;);
 
 template&lt;typename LAYER&gt;
-void length(const Marking&amp;, place_t&lt;GSPN&gt;);
+void Length(const Marking&amp;, place_t&lt;GSPN&gt;);
 
 template&lt;typename LAYER&gt;
-void length(const Marking&amp;, place_t&lt;GSPN&gt;, color_t&lt;Marking,LAYER&gt;);
+void Length(const Marking&amp;, place_t&lt;GSPN&gt;, color_t&lt;Marking,LAYER&gt;);
 
 template&lt;typename LAYER, typename UnaryOperator&gt;
 std::tuple&lt;std::resultof&lt;UnaryOperator&gt;,bool&gt;
-get(const Marking&amp;, place_t&lt;Marking&gt;, UnaryOperator&amp; functor);
+Get(const Marking&amp;, place_t&lt;Marking&gt;, UnaryOperator&amp; functor);
 
 template&lt;typename LayerFrom, typename LayerTo&gt;
 void
-move(const Marking&amp;, place_t&lt;Marking,LayerFrom&gt;, place_t&lt;Marking,LayerTo&gt;, size_t);
+Move(const Marking&amp;, place_t&lt;Marking,LayerFrom&gt;, place_t&lt;Marking,LayerTo&gt;, size_t);
 
 template&lt;typename LayerFrom, typename LayerTo, typename UnaryOperator&gt;
 void
-move_modify(const Marking&amp;, place_t&lt;Marking,LayerFrom&gt;, place_t&lt;Marking,LayerTo&gt;,
+MoveModify(const Marking&amp;, place_t&lt;Marking,LayerFrom&gt;, place_t&lt;Marking,LayerTo&gt;,
 size_t, UnaryOperator&amp; functor);</pre>
 </div>
 <p>It is possible to move tokens between layers with the same token type.
 A <tt class="docutils literal"><span class="pre">TokenContainer</span></tt> holds the tokens. There are two types, <tt class="docutils literal"><span class="pre">Colored</span></tt>
 and <tt class="docutils literal"><span class="pre">Uncolored</span></tt>. The color of a token comes from a traits class:</p>
 <div class="highlight-python"><pre>template&lt;typename Token&gt;
-token_color
+TokenColor
 {
   typedef void type;
 }
 
 template&lt;typename Token&gt;
-unique_color
+UniqueColor
 {
   static const bool value=true;
 };</pre>
@@ -181,21 +173,19 @@ that depend on the current semi-Markov simulation time.</p>
 at all places, the enabling time of every enabled transition, and
 the current time of the semi-Markov model, which is the sum of all
 transition intervals since the start of the simulation.:</p>
-<div class="highlight-python"><pre>template&lt;typename GSPN, typename Marking, typename TimeStrategy=KahanTime&gt;
+<div class="highlight-python"><pre>template&lt;typename GSPN, typename Marking, typename UserState&gt;
 class GSPNState
 {
 public:
   typedef Marking Marking;
   Marking marking;
-  std::map&lt;trans_t&lt;GSPN&gt;,double&gt; enabling_time;
-  double current_time() const;
-  double add_time(double);
+  double CurrentTime() const;
+  double SetTime(double);
+  UserState user;
+  TransitionKey last_transition;
 };</pre>
 </div>
-<p>The GSPNState re-advertises the <tt class="docutils literal"><span class="pre">Marking</span></tt> type through a public typedef.
-There are two <tt class="docutils literal"><span class="pre">TimeStrategy</span></tt> classes. <tt class="docutils literal"><span class="pre">SimpleTime</span></tt> stores time in
-a double, and <tt class="docutils literal"><span class="pre">KahanTime</span></tt> uses the Kahan summation algorithm to
-ameliorate roundoff error when adding small intervals to larger times.</p>
+<p>The GSPNState re-advertises the <tt class="docutils literal"><span class="pre">Marking</span></tt> type through a public typedef.</p>
 </div>
 </div>
 
