@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -10,12 +8,12 @@
     
     <title>Using ExplicitTransitions to Construct a GSPN &mdash; Semi-Markov 1.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    './',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -27,6 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
+    <link rel="up" title="Semi-Markov Library Manual" href="manual.html" />
     <link rel="next" title="Simulating the Trajectory of a Semi-Markov GSPN" href="gspntrajectory.html" />
     <link rel="prev" title="Mathematics of the Semi-Markov Model and GSPN" href="mathematics.html" /> 
   </head>
@@ -43,9 +42,49 @@
         <li class="right" >
           <a href="mathematics.html" title="Mathematics of the Semi-Markov Model and GSPN"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="manual.html" accesskey="U">Semi-Markov Library Manual</a> &raquo;</li> 
       </ul>
-    </div>  
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using ExplicitTransitions to Construct a GSPN</a><ul>
+<li><a class="reference internal" href="#the-type-of-the-gspn-model">The Type of the GSPN Model</a></li>
+<li><a class="reference internal" href="#define-transitions">Define Transitions</a></li>
+<li><a class="reference internal" href="#using-explicittransitionsbuilder">Using ExplicitTransitionsBuilder</a></li>
+<li><a class="reference internal" href="#create-marking-and-state">Create Marking and State</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mathematics.html"
+                        title="previous chapter">Mathematics of the Semi-Markov Model and GSPN</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="gspntrajectory.html"
+                        title="next chapter">Simulating the Trajectory of a Semi-Markov GSPN</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/explicit.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
@@ -91,7 +130,7 @@ defined by what each entity is</p>
 </a>
 <p>An example of a <tt class="docutils literal"><span class="pre">PlaceKey</span></tt> from an SIR model shows that defining
 such a struct is verbose but painless:</p>
-<div class="highlight-python"><pre>struct SIRPlace
+<div class="highlight-python"><div class="highlight"><pre>struct SIRPlace
 {
   size_t disease;
   size_t individual;
@@ -118,14 +157,16 @@ such a struct is verbose but painless:</p>
   std::ostream&amp;
   operator&lt;&lt;(std::ostream&amp; os, const SIRPlace&amp; cp)
   {
-    return os &lt;&lt; &#x27;(&#x27; &lt;&lt; cp.disease &lt;&lt; &quot;, &quot; &lt;&lt; cp.individual&lt;&lt;&#x27;)&#x27;;
+    return os &lt;&lt; &#39;(&#39; &lt;&lt; cp.disease &lt;&lt; &quot;, &quot; &lt;&lt; cp.individual&lt;&lt;&#39;)&#39;;
   }
-};</pre>
+};
+</pre></div>
 </div>
 <p>The template parameters for <tt class="docutils literal"><span class="pre">ExplicitTransitions</span></tt> are as above:</p>
-<div class="highlight-python"><pre>typedef LocalMarking&lt;Uncolored&lt;TokenType&gt;&gt; Local;
+<div class="highlight-python"><div class="highlight"><pre>typedef LocalMarking&lt;Uncolored&lt;TokenType&gt;&gt; Local;
 typedef ExplicitTransitions&lt;PlaceKey, TransitionKey, Local,
-                            RandGen, UserState&gt; GSPN;</pre>
+                            RandGen, UserState&gt; GSPN;
+</pre></div>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">LocalMarking</span></tt> class is the marking of input and output tokens
 for a particular transition. Instead of using <tt class="docutils literal"><span class="pre">PlaceKey</span></tt> to identify
@@ -144,7 +185,7 @@ so they are in one function.</p>
 <p>A transition inherits from the <tt class="docutils literal"><span class="pre">ExplicitTransition</span></tt> template.
 It acts on the local marking to produce distributions or move
 tokens:</p>
-<div class="highlight-python"><pre>using Transition=ExplicitTransition&lt;Local,RandGen,WithParams&gt;;
+<div class="highlight-python"><div class="highlight"><pre>using Transition=ExplicitTransition&lt;Local,RandGen,WithParams&gt;;
 using Dist=TransitionDistribution&lt;RandGen&gt;;
 
 class InfectNeighbor : public Transition
@@ -169,7 +210,8 @@ class InfectNeighbor : public Transition
   {
     local_marking.template transfer_by_stochiometric_coefficient&lt;0&gt;(rng);
   }
-};</pre>
+};
+</pre></div>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">Enabled()</span></tt> method&#8217;s parameters are</p>
 <ul class="simple">
@@ -201,20 +243,21 @@ object. The builder has just three methods, <cite>add_place()</cite>,
 have, as inputs and outputs, places which exist. It ensures
 every PlaceKey and TransitionKey is unique. The signatures
 of its methods:</p>
-<div class="highlight-python"><pre>void BuildGraph::AddPlace(const PlaceKey&amp;, size_t token_layer);
+<div class="highlight-python"><div class="highlight"><pre>void BuildGraph::AddPlace(const PlaceKey&amp;, size_t token_layer);
 
 typedef std::tuple&lt;PlaceKey,int&gt; BuildGraph::PlaceEdge;
 
 void BuildGraph::AddTransition(const TransitionKey&amp;,
     const std::vector&lt;BuildGraph::PlaceEdge&gt;&amp;,
-    std::unique_ptr&lt;ExplicitTransition&lt;&lt;Local,RandGen,WithParams&gt;);</pre>
+    std::unique_ptr&lt;ExplicitTransition&lt;&lt;Local,RandGen,WithParams&gt;);
+</pre></div>
 </div>
 <p>The <cite>PlaceEdge</cite> contains a PlaceKey and a stochiometric coefficient,
 which should be negative on inputs and positive on outputs, and specifies
 the number of tokens required and the number to move when firing.</p>
 <p>For example, we can take advantage of the C++ initializer_list
 to construct a GSPN succinctly:</p>
-<div class="highlight-python"><pre>GSPN
+<div class="highlight-python"><div class="highlight"><pre>GSPN
 build_system(size_t individual_cnt)
 {
   BuildGraph&lt;GSPN&gt; bg;
@@ -259,7 +302,8 @@ build_system(size_t individual_cnt)
 
   // std::move the transitions because they contain unique_ptr.
   return std::move(bg.build());
-}</pre>
+}
+</pre></div>
 </div>
 </div>
 <div class="section" id="create-marking-and-state">
@@ -270,19 +314,21 @@ While we defined a <cite>PlaceKey</cite> above, the <cite>ExplicitTransitions</c
 class uses a different place and transition key internally,
 chosen by the Boost Graph Library implementation. Both are
 just type <cite>size_t</cite>. The marking and state are therefore:</p>
-<div class="highlight-python"><pre>using Mark=Marking&lt;size_t, Uncolored&lt;IndividualToken&gt;&gt;;
+<div class="highlight-python"><div class="highlight"><pre>using Mark=Marking&lt;size_t, Uncolored&lt;IndividualToken&gt;&gt;;
 using State=GSPNState&lt;Mark,TransitionKey,UserState&gt;;
 
-State state;</pre>
+State state;
+</pre></div>
 </div>
 <p>If the <cite>UserState</cite> had a member named <cite>parameters</cite>, then we could access
 it as <cite>state.user.parameters</cite>.</p>
 <p>How do we initialize the marking? Unfortunately, the marking doesn&#8217;t
 use our <cite>PlaceKey</cite>, so we have to add a translation step from
 the <cite>PlaceKey</cite> we know to the <cite>size_t</cite> we don&#8217;t:</p>
-<div class="highlight-python"><pre>size_t susceptible=gspn.PlaceVertex(
+<div class="highlight-python"><div class="highlight"><pre>size_t susceptible=gspn.PlaceVertex(
     PlaceKey{Disease::Susceptible, individual_idx});
-add&lt;0&gt;(state.marking, susceptible, IndividualToken{});</pre>
+add&lt;0&gt;(state.marking, susceptible, IndividualToken{});
+</pre></div>
 </div>
 <p>The GSPN remembers the original <cite>PlaceKey</cite> and will translate
 for us. The second line adds a new token to the marking.</p>
@@ -294,45 +340,6 @@ to simulate a trajectory of the system.</p>
 
 
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Using ExplicitTransitions to Construct a GSPN</a><ul>
-<li><a class="reference internal" href="#the-type-of-the-gspn-model">The Type of the GSPN Model</a></li>
-<li><a class="reference internal" href="#define-transitions">Define Transitions</a></li>
-<li><a class="reference internal" href="#using-explicittransitionsbuilder">Using ExplicitTransitionsBuilder</a></li>
-<li><a class="reference internal" href="#create-marking-and-state">Create Marking and State</a></li>
-</ul>
-</li>
-</ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="mathematics.html"
-                        title="previous chapter">Mathematics of the Semi-Markov Model and GSPN</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="gspntrajectory.html"
-                        title="next chapter">Simulating the Trajectory of a Semi-Markov GSPN</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/explicit.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -349,12 +356,13 @@ to simulate a trajectory of the system.</p>
         <li class="right" >
           <a href="mathematics.html" title="Mathematics of the Semi-Markov Model and GSPN"
              >previous</a> |</li>
-        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="manual.html" >Semi-Markov Library Manual</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2014, Andrew Dolgert, David Schneider.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

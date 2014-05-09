@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -10,12 +8,12 @@
     
     <title>Simulating the Trajectory of a Semi-Markov GSPN &mdash; Semi-Markov 1.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    './',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -27,6 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
+    <link rel="up" title="Semi-Markov Library Manual" href="manual.html" />
     <link rel="next" title="Observations of the State" href="observestate.html" />
     <link rel="prev" title="Using ExplicitTransitions to Construct a GSPN" href="explicit.html" /> 
   </head>
@@ -43,9 +42,38 @@
         <li class="right" >
           <a href="explicit.html" title="Using ExplicitTransitions to Construct a GSPN"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="manual.html" accesskey="U">Semi-Markov Library Manual</a> &raquo;</li> 
       </ul>
-    </div>  
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="explicit.html"
+                        title="previous chapter">Using ExplicitTransitions to Construct a GSPN</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="observestate.html"
+                        title="next chapter">Observations of the State</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/gspntrajectory.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
@@ -77,12 +105,13 @@ to present to a propagator
 distributions in time of the currently-enabled competing processes.
 The propagator is a function which samples these distributions to
 return the next transition to fire.:</p>
-<div class="highlight-python"><pre>using HazardPropagator=NonHomogeneousPoissonProcesses&lt;TransitionKey,RandGen&gt;;
+<div class="highlight-python"><div class="highlight"><pre>using HazardPropagator=NonHomogeneousPoissonProcesses&lt;TransitionKey,RandGen&gt;;
 HazardPropagator competing_hazards;
 using GeneralPropagator=PropagateCompetingProcesses&lt;TransitionKey,RandGen&gt;;
 GeneralPropagator other_processes;
 using Dynamics=StochasticDynamics&lt;SIRGSPN,SIRState,RandGen&gt;;
-Dynamics dynamics(gspn, {&amp;competing_hazards, &amp;other_processes});</pre>
+Dynamics dynamics(gspn, {&amp;competing_hazards, &amp;other_processes});
+</pre></div>
 </div>
 <p>It is the StochasticDynamics class that coordinates, inside, with
 the partial core matrix. It will take
@@ -93,14 +122,15 @@ When a transition changes the marking,
 the StochasticDynamics object is able to track which parts of the
 marking changed and enable or disable transitions appropriately.</p>
 <p>Finally, the main loop becomes short:</p>
-<div class="highlight-python"><pre>dynamics.Initialize(&amp;state, &amp;rng);
+<div class="highlight-python"><div class="highlight"><pre>dynamics.Initialize(&amp;state, &amp;rng);
 bool running=true;
 auto nothing=[](SIRState&amp;)-&gt;void {};
 while (running) {
   running=dynamics(state);
   output_function(state);
 }
-output_function.final(state);</pre>
+output_function.final(state);
+</pre></div>
 </div>
 <p>Here, <tt class="docutils literal"><span class="pre">output_function</span></tt> is an object which acts on the state
 and gathers results.</p>
@@ -108,34 +138,6 @@ and gathers results.</p>
 
 
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="explicit.html"
-                        title="previous chapter">Using ExplicitTransitions to Construct a GSPN</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="observestate.html"
-                        title="next chapter">Observations of the State</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/gspntrajectory.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -152,12 +154,13 @@ and gathers results.</p>
         <li class="right" >
           <a href="explicit.html" title="Using ExplicitTransitions to Construct a GSPN"
              >previous</a> |</li>
-        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="manual.html" >Semi-Markov Library Manual</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2014, Andrew Dolgert, David Schneider.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

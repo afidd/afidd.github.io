@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -10,12 +8,12 @@
     
     <title>Marking Reference &mdash; Semi-Markov 1.0 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
+        URL_ROOT:    './',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -27,8 +25,9 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
+    <link rel="up" title="Semi-Markov Library Reference" href="reference.html" />
     <link rel="next" title="Continuous Distributions Reference" href="distributions.html" />
-    <link rel="prev" title="Observations of the State" href="observestate.html" /> 
+    <link rel="prev" title="Semi-Markov Library Reference" href="reference.html" /> 
   </head>
   <body>
     <div class="related">
@@ -41,11 +40,53 @@
           <a href="distributions.html" title="Continuous Distributions Reference"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="observestate.html" title="Observations of the State"
+          <a href="reference.html" title="Semi-Markov Library Reference"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="reference.html" accesskey="U">Semi-Markov Library Reference</a> &raquo;</li> 
       </ul>
-    </div>  
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Marking Reference</a><ul>
+<li><a class="reference internal" href="#local-marking">Local Marking</a><ul>
+<li><a class="reference internal" href="#helper-classes">Helper Classes</a></li>
+<li><a class="reference internal" href="#localmarking-class">LocalMarking Class</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#marking-class">Marking Class</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="reference.html"
+                        title="previous chapter">Semi-Markov Library Reference</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="distributions.html"
+                        title="next chapter">Continuous Distributions Reference</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/marking.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
@@ -88,15 +129,16 @@ without color.</p>
 <div class="section" id="localmarking-class">
 <h3>LocalMarking Class<a class="headerlink" href="#localmarking-class" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
-<dt id="afidd::smv::LocalMarking:typename-...-TokenContainers:">
-<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">LocalMarking&lt;typename ... TokenContainers&gt;</tt><a class="headerlink" href="#afidd::smv::LocalMarking:typename-...-TokenContainers:" title="Permalink to this definition">¶</a></dt>
+<dt id="afidd::smv::LocalMarking:typename-TokenContainers:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">LocalMarking&lt;typename TokenContainers&gt;</tt><a class="headerlink" href="#afidd::smv::LocalMarking:typename-TokenContainers:" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class is responsible for reading and changing the subset
 of the marking associated with the input places and output
 places of a transition. The Marking for the whole system
 puts values into this class and checks it to see what changes
 have been made.</p>
 <p>The template argument is a list of token containers. For example:</p>
-<div class="highlight-python"><pre>typedef LocalMarking&lt;Uncolored&lt;CowToken&gt;,Uncolored&lt;BatToken&gt;&gt; MyLocal;</pre>
+<div class="highlight-python"><div class="highlight"><pre>typedef LocalMarking&lt;Uncolored&lt;CowToken&gt;,Uncolored&lt;BatToken&gt;&gt; MyLocal;
+</pre></div>
 </div>
 <p>With
 this definition, the <cite>CowToken</cite> is layer 0 and the <cite>BatToken</cite>
@@ -153,14 +195,15 @@ std::tuple&lt;F::result_type, bool&gt; <tt class="descname">Get&lt;I, F&gt;</tt>
 type <cite>F</cite> and returns the result of that functor. For instance, you might
 want to know the average of the <cite>birthday</cite> property of a set of tokens
 on the second input arc of a transition:</p>
-<div class="highlight-python"><pre>auto average=local_marking.template get&lt;0&gt;(1,
+<div class="highlight-python"><div class="highlight"><pre>auto average=local_marking.template get&lt;0&gt;(1,
   [](const Uncolored&lt;Children&gt;&amp; kids)-&gt;double {
       double total=0.0;
       for (const auto&amp; k : kids) {
           total+=k.birthday;
       }
       return total/kids.size();
-  });</pre>
+  });
+</pre></div>
 </div>
 <p>The <cite>get</cite> function returns a <cite>std::tuple&lt;double,bool&gt;</cite>, where the first
 type is the return type of your function and the second is whether
@@ -192,10 +235,11 @@ void <tt class="descname">Move&lt;I, J, Modifier&gt;</tt><big>(</big>size_t <em>
 <dd><p>This moves <cite>count</cite> number of tokens from a place in the Ith token layer
 to a place in the Jth token layer (usually the same layer), and applies
 the function <cite>functor</cite> to each token. For example:</p>
-<div class="highlight-python"><pre>local_marking.template move&lt;0,0&gt;(1, 3, 1,
+<div class="highlight-python"><div class="highlight"><pre>local_marking.template move&lt;0,0&gt;(1, 3, 1,
   [](CowToken&amp; bessie)-&gt;void {
     bessie.parity+=1; // The number of times the cow gave birth.
-  });</pre>
+  });
+</pre></div>
 </div>
 </dd></dl>
 
@@ -239,8 +283,8 @@ it also executes the AndModify functor on each token.</p>
 <p>The Marking class is much like the LocalMarking, but it specifies
 places using a PlaceKey.</p>
 <dl class="class">
-<dt>
-<tt class="descname">afidd::smv::Marking&lt;PlaceKey,typepname... TokenContainers&gt;</tt></dt>
+<dt id="afidd::smv::Marking:PlaceKey.typename-TokenContainers:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">Marking&lt;PlaceKey, typename TokenContainers&gt;</tt><a class="headerlink" href="#afidd::smv::Marking:PlaceKey.typename-TokenContainers:" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class holds the marking for the whole system. Each place
 can contain one type of token container, specified by the
 list of TokenContainers.</p>
@@ -311,47 +355,6 @@ to each moved token.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Marking Reference</a><ul>
-<li><a class="reference internal" href="#local-marking">Local Marking</a><ul>
-<li><a class="reference internal" href="#helper-classes">Helper Classes</a></li>
-<li><a class="reference internal" href="#localmarking-class">LocalMarking Class</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#marking-class">Marking Class</a></li>
-</ul>
-</li>
-</ul>
-
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="observestate.html"
-                        title="previous chapter">Observations of the State</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="distributions.html"
-                        title="next chapter">Continuous Distributions Reference</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/marking.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
       <div class="clearer"></div>
     </div>
     <div class="related">
@@ -364,14 +367,15 @@ to each moved token.</p>
           <a href="distributions.html" title="Continuous Distributions Reference"
              >next</a> |</li>
         <li class="right" >
-          <a href="observestate.html" title="Observations of the State"
+          <a href="reference.html" title="Semi-Markov Library Reference"
              >previous</a> |</li>
-        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="reference.html" >Semi-Markov Library Reference</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2014, Andrew Dolgert, David Schneider.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>
