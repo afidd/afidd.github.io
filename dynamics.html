@@ -1,0 +1,334 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Dynamics Reference &mdash; Semi-Markov 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
+    <link rel="up" title="Semi-Markov Library Reference" href="reference.html" />
+    <link rel="next" title="Semi-Markov Library FAQ" href="faq.html" />
+    <link rel="prev" title="Continuous Distributions Reference" href="distributions.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="faq.html" title="Semi-Markov Library FAQ"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="distributions.html" title="Continuous Distributions Reference"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="reference.html" accesskey="U">Semi-Markov Library Reference</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Dynamics Reference</a><ul>
+<li><a class="reference internal" href="#gspnstate">GSPNState</a><ul>
+<li><a class="reference internal" href="#declaration">Declaration</a></li>
+<li><a class="reference internal" href="#member-functions">Member Functions</a></li>
+<li><a class="reference internal" href="#members">Members</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#stochastic-dynamics">Stochastic Dynamics</a><ul>
+<li><a class="reference internal" href="#id1">Declaration</a></li>
+<li><a class="reference internal" href="#id2">Member Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#continuous-propagator">Continuous Propagator</a><ul>
+<li><a class="reference internal" href="#id3">Declaration</a></li>
+<li><a class="reference internal" href="#pure-virtual-member-functions">Pure Virtual Member Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#propagatecompetingprocesses">PropagateCompetingProcesses</a><ul>
+<li><a class="reference internal" href="#id5">Declaration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#nonhomogeneouspoissonprocesses">NonHomogeneousPoissonProcesses</a><ul>
+<li><a class="reference internal" href="#id7">Declaration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="distributions.html"
+                        title="previous chapter">Continuous Distributions Reference</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="faq.html"
+                        title="next chapter">Semi-Markov Library FAQ</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/dynamics.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="dynamics-reference">
+<h1>Dynamics Reference<a class="headerlink" href="#dynamics-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="gspnstate">
+<h2>GSPNState<a class="headerlink" href="#gspnstate" title="Permalink to this headline">¶</a></h2>
+<p>This holds the state for the whole system.</p>
+<div class="section" id="declaration">
+<h3>Declaration<a class="headerlink" href="#declaration" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="afidd::smv::GSPNState:typename-Mark.typename-TransitionKey.typename-UserState:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">GSPNState&lt;typename Mark, typename TransitionKey, typename UserState&gt;</tt><a class="headerlink" href="#afidd::smv::GSPNState:typename-Mark.typename-TransitionKey.typename-UserState:" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <tt class="docutils literal"><span class="pre">Mark</span></tt> is the type of the Marking class. <tt class="docutils literal"><span class="pre">TransitionKey</span></tt> is
+the transition key for the GSPN. The <tt class="docutils literal"><span class="pre">UserState</span></tt> may be omitted
+but is whatever state you would like to add to the system state.
+It will be accessible within transition as the <tt class="docutils literal"><span class="pre">UserState</span></tt>
+variable and is accessible from the state as <tt class="docutils literal"><span class="pre">GSPNState.user</span></tt>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="member-functions">
+<h3>Member Functions<a class="headerlink" href="#member-functions" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="CurrentTime">
+double <tt class="descname">CurrentTime</tt><big>(</big><big>)</big><a class="headerlink" href="#CurrentTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current time in the system.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="SetTime__double">
+void <tt class="descname">SetTime</tt><big>(</big>double <em>time</em><big>)</big><a class="headerlink" href="#SetTime__double" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the system time.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="members">
+<h3>Members<a class="headerlink" href="#members" title="Permalink to this headline">¶</a></h3>
+<dl class="member">
+<dt id="marking__Mark">
+Mark <tt class="descname">marking</tt><a class="headerlink" href="#marking__Mark" title="Permalink to this definition">¶</a></dt>
+<dd><p>The type of this is the Mark type passed in.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="user__UserState">
+UserState <tt class="descname">user</tt><a class="headerlink" href="#user__UserState" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the default-instantiated value of the UserState type.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="last_transition__TransitionKey">
+TransitionKey <tt class="descname">last_transition</tt><a class="headerlink" href="#last_transition__TransitionKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>The transition key for the last transition to fire.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="stochastic-dynamics">
+<h2>Stochastic Dynamics<a class="headerlink" href="#stochastic-dynamics" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Declaration<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="afidd::smv::StochasticDynamics:typename-GSPN.typename-DynState.typename-RandGen:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">StochasticDynamics&lt;typename GSPN, typename DynState, typename RandGen&gt;</tt><a class="headerlink" href="#afidd::smv::StochasticDynamics:typename-GSPN.typename-DynState.typename-RandGen:" title="Permalink to this definition">¶</a></dt>
+<dd><p><tt class="docutils literal"><span class="pre">StochasticDynamics</span></tt> is responsible for advancing the state of
+the system using the given Propagators. GSPN is the type of the
+Petri net. DynState is the type of the state of the system.
+RandGen is the type of the random number generator.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>Member Functions<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="StochasticDynamics__GSPNR.PropagatorVectorR">
+ <tt class="descname">StochasticDynamics</tt><big>(</big>GSPN&amp; <em>gspn</em>, PropagatorVector&amp; <em>pv</em><big>)</big><a class="headerlink" href="#StochasticDynamics__GSPNR.PropagatorVectorR" title="Permalink to this definition">¶</a></dt>
+<dd><p>The propagator vector is a type declared in this class.
+In its constructor, we pass the model for the system and the list
+of propagators which determine the next state for the system.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Initialize__StateP.RangGenP">
+ <tt class="descname">Initialize</tt><big>(</big>State* <em>state</em>, RangGen* <em>rng</em><big>)</big><a class="headerlink" href="#Initialize__StateP.RangGenP" title="Permalink to this definition">¶</a></dt>
+<dd><p>There may be internal arrays initialized at this stage once the model
+and state are known. This must be called before running the
+<tt class="docutils literal"><span class="pre">StochasticDynamics.</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="call-operator__StateR">
+ <tt class="descname">operator()</tt><big>(</big>State&amp; <em>state</em><big>)</big><a class="headerlink" href="#call-operator__StateR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This modifies the state, in place, according to the propagators.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="continuous-propagator">
+<h2>Continuous Propagator<a class="headerlink" href="#continuous-propagator" title="Permalink to this headline">¶</a></h2>
+<p>The pure virtual base class for propagators of the state.
+There are multiple propagators because some propagators are more
+efficient than others at handling subsets of the transitions
+enabled in the system.</p>
+<div class="section" id="id3">
+<h3>Declaration<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="afidd::smv::ContinuousPropagator:typename-TransitionKey.typename-RNG:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">ContinuousPropagator&lt;typename TransitionKey, typename RNG&gt;</tt><a class="headerlink" href="#afidd::smv::ContinuousPropagator:typename-TransitionKey.typename-RNG:" title="Permalink to this definition">¶</a></dt>
+<dd><p>The arguments are the transition key of the GSPN and the random number generator type.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pure-virtual-member-functions">
+<h3>Pure Virtual Member Functions<a class="headerlink" href="#pure-virtual-member-functions" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="Include__TransitionDistribution:RNG:CRC">
+bool <tt class="descname">Include</tt><big>(</big>const TransitionDistribution&lt;RNG&gt;&amp; <em>distribution</em><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#Include__TransitionDistribution:RNG:CRC" title="Permalink to this definition">¶</a></dt>
+<dd><p>A propagator can examine a distribution from the core matrix to decide whether
+it will accept it.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Next__double.RNGRC">
+std::tuple&lt;TransitionKey, double&gt; <tt class="descname">Next</tt><big>(</big>double <em>now</em>, RNG&amp; <em>rng</em><big>)</big><tt class="descclassname"> const</tt><tt class="descclassname"> = 0</tt><a class="headerlink" href="#Next__double.RNGRC" title="Permalink to this definition">¶</a></dt>
+<dd><p>What is the next predicted transition from this propagator.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Enabled__TransitionKeyCRC">
+std::tuple&lt;bool, double&gt; <tt class="descname">Enabled</tt><big>(</big>const TransitionKey&amp; <em>tkey</em><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#Enabled__TransitionKeyCRC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Is this transition currently enabled?</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Enable__TransitionKeyCR.std::unique_ptr:TransitionDistribution:RNG::R.double.b.RNGR">
+void <tt class="descname">Enable</tt><big>(</big>const TransitionKey&amp; <em>tkey</em>, std::unique_ptr&lt;TransitionDistribution&lt;RNG&gt;&gt;&amp; <em>distribution</em>, double <em>when</em>, bool <em>previously_enabled</em>, RNG&amp; <em>rng</em><big>)</big><a class="headerlink" href="#Enable__TransitionKeyCR.std::unique_ptr:TransitionDistribution:RNG::R.double.b.RNGR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable this transition at this time.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Disable__TransitionKeyCR.double">
+void <tt class="descname">Disable</tt><big>(</big>const TransitionKey&amp; <em>tkey</em>, double <em>when</em><big>)</big><a class="headerlink" href="#Disable__TransitionKeyCR.double" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable this transition at this time.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="Fire__TransitionKeyCR.double.RNGR">
+void <tt class="descname">Fire</tt><big>(</big>const TransitionKey&amp; <em>tkey</em>, double <em>when</em>, RNG&amp; <em>rng</em><big>)</big><a class="headerlink" href="#Fire__TransitionKeyCR.double.RNGR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This transition has fired.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="propagatecompetingprocesses">
+<h2>PropagateCompetingProcesses<a class="headerlink" href="#propagatecompetingprocesses" title="Permalink to this headline">¶</a></h2>
+<p>This subclass of <tt class="docutils literal"><span class="pre">ContinuousPropagator</span></tt> uses Gillespie&#8217;s First Reaction
+method (<a class="reference internal" href="references.html#gillespie-1978" id="id4">[Gillespie:1978]</a>) to choose the next transition. It&#8217;s methods are exactly those listed
+above.</p>
+<div class="section" id="id5">
+<h3>Declaration<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="afidd::smv::PropagateCompetingProcesses:typename-TransitionKey.typename-RNG:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">PropagateCompetingProcesses&lt;typename TransitionKey, typename RNG&gt;</tt><a class="headerlink" href="#afidd::smv::PropagateCompetingProcesses:typename-TransitionKey.typename-RNG:" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="PropagateCompetingProcesses">
+ <tt class="descname">PropagateCompetingProcesses</tt><big>(</big><big>)</big><a class="headerlink" href="#PropagateCompetingProcesses" title="Permalink to this definition">¶</a></dt>
+<dd><p>The constructor has no arguments.</p>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="nonhomogeneouspoissonprocesses">
+<h2>NonHomogeneousPoissonProcesses<a class="headerlink" href="#nonhomogeneouspoissonprocesses" title="Permalink to this headline">¶</a></h2>
+<p>This subclass of <tt class="docutils literal"><span class="pre">ContinuousPropagator</span></tt> uses Anderson&#8217;s method (<a class="reference internal" href="references.html#anderson-2007" id="id6">[Anderson:2007]</a>)
+to choose the next transition. It&#8217;s methods are exactly those listed
+above.</p>
+<div class="section" id="id7">
+<h3>Declaration<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="afidd::smv::NonHomogeneousPoissonProcesses:typename-TransitionKey.typename-RNG:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">NonHomogeneousPoissonProcesses&lt;typename TransitionKey, typename RNG&gt;</tt><a class="headerlink" href="#afidd::smv::NonHomogeneousPoissonProcesses:typename-TransitionKey.typename-RNG:" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="NonHomogeneousPoissonProcesses">
+ <tt class="descname">NonHomogeneousPoissonProcesses</tt><big>(</big><big>)</big><a class="headerlink" href="#NonHomogeneousPoissonProcesses" title="Permalink to this definition">¶</a></dt>
+<dd><p>The constructor has no arguments.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="faq.html" title="Semi-Markov Library FAQ"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="distributions.html" title="Continuous Distributions Reference"
+             >previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="reference.html" >Semi-Markov Library Reference</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Andrew Dolgert, David Schneider.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

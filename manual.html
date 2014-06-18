@@ -82,41 +82,37 @@
 <h1>Semi-Markov Library Manual<a class="headerlink" href="#semi-markov-library-manual" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html#organization-of-library">Organization of library</a></li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html#acknowledgements">Acknowledgements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html#availability-and-distribution">Availability and distribution</a></li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html#background">Background</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#estimating-hazard-rates-from-binned-time-to-event-data">Estimating hazard rates from binned time-to-event data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#finite-state-machines">Finite state machines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#markov-chains">Markov chains</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#markov-processes">Markov processes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#semi-markov-processes">Semi-Markov processes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#generalized-stochastic-petri-nets">Generalized stochastic Petri nets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#organization-of-library">Organization of library</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#acknowledgements">Acknowledgements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#availability-and-distribution">Availability and distribution</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html#examples">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#frogs-on-lily-pads">Frogs on lily pads</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#susceptible-infected-susceptible-sis-model-of-infectious-disease-transmission">Susceptible-infected-susceptible (SIS) model of infectious disease transmission</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#management-of-dairy-herds">Management of dairy herds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Requirements and Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#installation">Installation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html#references">References</a></li>
-<li class="toctree-l1"><a class="reference internal" href="install.html">Requirements and Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mathematics.html">Mathematics of the Semi-Markov Model and GSPN</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="mathematics.html#generalized-stochastic-petri-net">Generalized Stochastic Petri Net</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mathematics.html#semi-markov-processes">Semi-Markov Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="background.html">Background</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="background.html#the-hazard-from-survival-analysis">The Hazard from Survival Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background.html#finite-state-machines-generate-trajectories">Finite State Machines Generate Trajectories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background.html#markov-chain-for-discrete-time-trajectories">Markov Chain for Discrete-Time Trajectories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background.html#markov-process-for-continuous-time-trajectories">Markov Process for Continuous-Time Trajectories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background.html#generalized-stochastic-petri-net-for-bookkeeping">Generalized Stochastic Petri Net for Bookkeeping</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="explicit.html">Using ExplicitTransitions to Construct a GSPN</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="explicit.html#the-type-of-the-gspn-model">The Type of the GSPN Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="explicit.html#define-transitions">Define Transitions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="explicit.html#using-explicittransitionsbuilder">Using ExplicitTransitionsBuilder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="explicit.html#create-marking-and-state">Create Marking and State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explicit.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="explicit.html#using-explicittransitions-to-construct-a-gspn">Using ExplicitTransitions to Construct a GSPN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explicit.html#simulating-the-trajectory-of-a-semi-markov-gspn">Simulating the Trajectory of a Semi-Markov GSPN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="explicit.html#observations-of-the-state">Observations of the State</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="gspntrajectory.html">Simulating the Trajectory of a Semi-Markov GSPN</a></li>
-<li class="toctree-l1"><a class="reference internal" href="observestate.html">Observations of the State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#weiss-two-state-brownion">Weiss Two-state Brownion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#susceptible-infected-recovered">Susceptible-Infected-Recovered</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 </div>
 </div>

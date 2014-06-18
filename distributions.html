@@ -26,7 +26,7 @@
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
     <link rel="up" title="Semi-Markov Library Reference" href="reference.html" />
-    <link rel="next" title="Semi-Markov Library FAQ" href="faq.html" />
+    <link rel="next" title="Dynamics Reference" href="dynamics.html" />
     <link rel="prev" title="Marking Reference" href="marking.html" /> 
   </head>
   <body>
@@ -37,7 +37,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="faq.html" title="Semi-Markov Library FAQ"
+          <a href="dynamics.html" title="Dynamics Reference"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="marking.html" title="Marking Reference"
@@ -48,12 +48,24 @@
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Continuous Distributions Reference</a><ul>
+<li><a class="reference internal" href="#transitiondistribution-base-class">TransitionDistribution Base Class</a></li>
+<li><a class="reference internal" href="#exponential-distribution">Exponential Distribution</a></li>
+<li><a class="reference internal" href="#weibull-distribution">Weibull Distribution</a></li>
+<li><a class="reference internal" href="#gamma-distribution">Gamma Distribution</a></li>
+<li><a class="reference internal" href="#piecewise-linear-distribution">Piecewise Linear Distribution</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="marking.html"
                         title="previous chapter">Marking Reference</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="faq.html"
-                        title="next chapter">Semi-Markov Library FAQ</a></p>
+  <p class="topless"><a href="dynamics.html"
+                        title="next chapter">Dynamics Reference</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/distributions.txt"
@@ -112,6 +124,8 @@ quantile, <span class="math">\(F^{-1},\)</span> look like</p>
 <p>Given any distributions from Boost::Random or std::random, this
 formula calculates the shifted quantile from the original quantile
 and cumulative distribution.</p>
+<div class="section" id="transitiondistribution-base-class">
+<h2>TransitionDistribution Base Class<a class="headerlink" href="#transitiondistribution-base-class" title="Permalink to this headline">¶</a></h2>
 <p>Transitions for this library implement the following interface.</p>
 <dl class="class">
 <dt id="afidd::smv::TransitionDistribution:RandomGenerator:">
@@ -167,6 +181,9 @@ Each sample can be taken from the difference between the two times,
 <span class="math">\((t_c-t_e)\)</span>, but passing both separately will be better for vectorization
 of sampling.</p>
 <p>The following distributions are currently in the library.</p>
+</div>
+<div class="section" id="exponential-distribution">
+<h2>Exponential Distribution<a class="headerlink" href="#exponential-distribution" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="afidd::smv::ExponentialDistribution:RandomNumberGenerator:">
 <em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">ExponentialDistribution&lt;RandomNumberGenerator&gt;</tt><a class="headerlink" href="#afidd::smv::ExponentialDistribution:RandomNumberGenerator:" title="Permalink to this definition">¶</a></dt>
@@ -204,6 +221,9 @@ If <cite>normal</cite> is less than one, it represents the probability that
 this distribution will fire at all.</p>
 </dd></dl>
 
+</div>
+<div class="section" id="weibull-distribution">
+<h2>Weibull Distribution<a class="headerlink" href="#weibull-distribution" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="afidd::smv::WeibullDistribution:RandomNumberGenerator:">
 <em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">WeibullDistribution&lt;RandomNumberGenerator&gt;</tt><a class="headerlink" href="#afidd::smv::WeibullDistribution:RandomNumberGenerator:" title="Permalink to this definition">¶</a></dt>
@@ -221,6 +241,9 @@ cumulative distribution and quantile.</p>
 The shift moves the distribution to the right.</p>
 </dd></dl>
 
+</div>
+<div class="section" id="gamma-distribution">
+<h2>Gamma Distribution<a class="headerlink" href="#gamma-distribution" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="afidd::smv::GammaDistribution:RandomNumberGenerator:">
 <em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">GammaDistribution&lt;RandomNumberGenerator&gt;</tt><a class="headerlink" href="#afidd::smv::GammaDistribution:RandomNumberGenerator:" title="Permalink to this definition">¶</a></dt>
@@ -234,6 +257,9 @@ It has two parameters, shape and scale.</p>
 <dd><p>The constructor initializes the two parameters, <span class="math">\(\alpha\)</span> and <span class="math">\(\theta.\)</span> It also sets the enabling time and optional shift and normal.</p>
 </dd></dl>
 
+</div>
+<div class="section" id="piecewise-linear-distribution">
+<h2>Piecewise Linear Distribution<a class="headerlink" href="#piecewise-linear-distribution" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="afidd::smv::PiecewiseLinearDistribution:RandomNumberGenerator:">
 <em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">PiecewiseLinearDistribution&lt;RandomNumberGenerator&gt;</tt><a class="headerlink" href="#afidd::smv::PiecewiseLinearDistribution:RandomNumberGenerator:" title="Permalink to this definition">¶</a></dt>
@@ -257,6 +283,7 @@ is the probability that this distribution will fire at all.</p>
 </dd></dl>
 
 </div>
+</div>
 
 
           </div>
@@ -271,7 +298,7 @@ is the probability that this distribution will fire at all.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="faq.html" title="Semi-Markov Library FAQ"
+          <a href="dynamics.html" title="Dynamics Reference"
              >next</a> |</li>
         <li class="right" >
           <a href="marking.html" title="Marking Reference"

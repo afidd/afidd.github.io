@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using ExplicitTransitions to Construct a GSPN &mdash; Semi-Markov 1.0 documentation</title>
+    <title>Tutorial &mdash; Semi-Markov 1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,8 +26,8 @@
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
     <link rel="up" title="Semi-Markov Library Manual" href="manual.html" />
-    <link rel="next" title="Simulating the Trajectory of a Semi-Markov GSPN" href="gspntrajectory.html" />
-    <link rel="prev" title="Mathematics of the Semi-Markov Model and GSPN" href="mathematics.html" /> 
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Background" href="background.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,10 +37,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="gspntrajectory.html" title="Simulating the Trajectory of a Semi-Markov GSPN"
+          <a href="examples.html" title="Examples"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="mathematics.html" title="Mathematics of the Semi-Markov Model and GSPN"
+          <a href="background.html" title="Background"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
           <li><a href="manual.html" accesskey="U">Semi-Markov Library Manual</a> &raquo;</li> 
@@ -50,21 +50,26 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Using ExplicitTransitions to Construct a GSPN</a><ul>
+<li><a class="reference internal" href="#">Tutorial</a><ul>
+<li><a class="reference internal" href="#using-explicittransitions-to-construct-a-gspn">Using ExplicitTransitions to Construct a GSPN</a><ul>
 <li><a class="reference internal" href="#the-type-of-the-gspn-model">The Type of the GSPN Model</a></li>
 <li><a class="reference internal" href="#define-transitions">Define Transitions</a></li>
 <li><a class="reference internal" href="#using-explicittransitionsbuilder">Using ExplicitTransitionsBuilder</a></li>
 <li><a class="reference internal" href="#create-marking-and-state">Create Marking and State</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#simulating-the-trajectory-of-a-semi-markov-gspn">Simulating the Trajectory of a Semi-Markov GSPN</a></li>
+<li><a class="reference internal" href="#observations-of-the-state">Observations of the State</a></li>
+</ul>
+</li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="mathematics.html"
-                        title="previous chapter">Mathematics of the Semi-Markov Model and GSPN</a></p>
+  <p class="topless"><a href="background.html"
+                        title="previous chapter">Background</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="gspntrajectory.html"
-                        title="next chapter">Simulating the Trajectory of a Semi-Markov GSPN</a></p>
+  <p class="topless"><a href="examples.html"
+                        title="next chapter">Examples</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/explicit.txt"
@@ -91,11 +96,13 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="using-explicittransitions-to-construct-a-gspn">
-<h1>Using ExplicitTransitions to Construct a GSPN<a class="headerlink" href="#using-explicittransitions-to-construct-a-gspn" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="using-explicittransitions-to-construct-a-gspn">
+<h2>Using ExplicitTransitions to Construct a GSPN<a class="headerlink" href="#using-explicittransitions-to-construct-a-gspn" title="Permalink to this headline">¶</a></h2>
 <p>The ExplicitTransitions class implements the GSPN concept.</p>
 <div class="section" id="the-type-of-the-gspn-model">
-<h2>The Type of the GSPN Model<a class="headerlink" href="#the-type-of-the-gspn-model" title="Permalink to this headline">¶</a></h2>
+<h3>The Type of the GSPN Model<a class="headerlink" href="#the-type-of-the-gspn-model" title="Permalink to this headline">¶</a></h3>
 <p>The author of the code supplies building blocks to this class:</p>
 <ul class="simple">
 <li>A token type. It should have an ostream <tt class="docutils literal"><span class="pre">operator&lt;&lt;</span></tt> defined.
@@ -176,7 +183,7 @@ transitions which don&#8217;t need to know how their marking is indexed and
 stored.</p>
 </div>
 <div class="section" id="define-transitions">
-<h2>Define Transitions<a class="headerlink" href="#define-transitions" title="Permalink to this headline">¶</a></h2>
+<h3>Define Transitions<a class="headerlink" href="#define-transitions" title="Permalink to this headline">¶</a></h3>
 <p>A transition has three responsibilities. Determine when it
 is enabled, choose a continuous variable distribution function
 for its firing time, and modify the marking when it fires.
@@ -235,7 +242,7 @@ If this transition was enabled and should remain so, then it
 likely wants to keep its original enabling time.</p>
 </div>
 <div class="section" id="using-explicittransitionsbuilder">
-<h2>Using ExplicitTransitionsBuilder<a class="headerlink" href="#using-explicittransitionsbuilder" title="Permalink to this headline">¶</a></h2>
+<h3>Using ExplicitTransitionsBuilder<a class="headerlink" href="#using-explicittransitionsbuilder" title="Permalink to this headline">¶</a></h3>
 <p>The implementation of <tt class="docutils literal"><span class="pre">ExplicitTransitions</span></tt> requires that
 we construct it with a builder which then produces the GSPN
 object. The builder has just three methods, <cite>add_place()</cite>,
@@ -307,7 +314,7 @@ build_system(size_t individual_cnt)
 </div>
 </div>
 <div class="section" id="create-marking-and-state">
-<h2>Create Marking and State<a class="headerlink" href="#create-marking-and-state" title="Permalink to this headline">¶</a></h2>
+<h3>Create Marking and State<a class="headerlink" href="#create-marking-and-state" title="Permalink to this headline">¶</a></h3>
 <p>The last step is to create the marking and state.
 There is one implementation of a marking in the library.
 While we defined a <cite>PlaceKey</cite> above, the <cite>ExplicitTransitions</cite>
@@ -337,6 +344,165 @@ We made places, transitions, and a marking. The next step is
 to simulate a trajectory of the system.</p>
 </div>
 </div>
+<div class="section" id="simulating-the-trajectory-of-a-semi-markov-gspn">
+<h2>Simulating the Trajectory of a Semi-Markov GSPN<a class="headerlink" href="#simulating-the-trajectory-of-a-semi-markov-gspn" title="Permalink to this headline">¶</a></h2>
+<p>Given a representation of a GSPN, what steps will simulate
+a trajectory from that GSPN? As a semi-Markov model, the GSPN
+tracks in time the state of a system and defines the possible
+transitions to next states of the system. The core matrix of a
+semi-Markov model is just that, the probability of any next state
+and the probability of when that a particular state happens.
+We simulate a trajectory by looking at only the transitions which
+are enabled for the current state. This is the <em>partial core matrix.</em>
+Given this partial core matrix, a propagator selects the next state.</p>
+<p>The partial core matrix has two responsibilities. For the
+underlying GSPN, it enforces the rule, central to this kind
+of semi-Markov model, that distributions of transitions are
+recalculated only when a transition fires which shares marking.
+Sharing markings is the only permitted way to express dependence among
+processes in the system. A distribution may depend arbitrarily
+on external state, such as temperature, but no transition can
+affect the distribution of another transition except by changing
+the marking.</p>
+<p>The partial core matrix also has a responsiblity
+to present to a propagator
+distributions in time of the currently-enabled competing processes.
+The propagator is a function which samples these distributions to
+return the next transition to fire.:</p>
+<div class="highlight-python"><div class="highlight"><pre>using HazardPropagator=NonHomogeneousPoissonProcesses&lt;TransitionKey,RandGen&gt;;
+HazardPropagator competing_hazards;
+using GeneralPropagator=PropagateCompetingProcesses&lt;TransitionKey,RandGen&gt;;
+GeneralPropagator other_processes;
+using Dynamics=StochasticDynamics&lt;SIRGSPN,SIRState,RandGen&gt;;
+Dynamics dynamics(gspn, {&amp;competing_hazards, &amp;other_processes});
+</pre></div>
+</div>
+<p>It is the StochasticDynamics class that coordinates, inside, with
+the partial core matrix. It will take
+enabled transitions from the GSPN and give their distributions
+to the appropriate propagator, depending on whether that propagator
+can calculate the firing time of that distribution.
+When a transition changes the marking,
+the StochasticDynamics object is able to track which parts of the
+marking changed and enable or disable transitions appropriately.</p>
+<p>Finally, the main loop becomes short:</p>
+<div class="highlight-python"><div class="highlight"><pre>dynamics.Initialize(&amp;state, &amp;rng);
+bool running=true;
+auto nothing=[](SIRState&amp;)-&gt;void {};
+while (running) {
+  running=dynamics(state);
+  output_function(state);
+}
+output_function.final(state);
+</pre></div>
+</div>
+<p>Here, <tt class="docutils literal"><span class="pre">output_function</span></tt> is an object which acts on the state
+and gathers results.</p>
+</div>
+<div class="section" id="observations-of-the-state">
+<h2>Observations of the State<a class="headerlink" href="#observations-of-the-state" title="Permalink to this headline">¶</a></h2>
+<p>After each transition, we observe the state of the
+system using the GSPN object and the GSPNState object.</p>
+<dl class="class">
+<dt id="afidd::smv::GSPNState:Marking.UserSate:">
+<em class="property">class </em><tt class="descclassname">afidd::smv::</tt><tt class="descname">GSPNState&lt;Marking, UserSate&gt;</tt><a class="headerlink" href="#afidd::smv::GSPNState:Marking.UserSate:" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class is the state of the system.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="GSPNState::marking__Marking:Place.Tokens:">
+Marking&lt;Place, Tokens&gt; <tt class="descclassname">GSPNState::</tt><tt class="descname">marking</tt><a class="headerlink" href="#GSPNState::marking__Marking:Place.Tokens:" title="Permalink to this definition">¶</a></dt>
+<dd><p>The marking is saved as a <cite>marking</cite> member. The member function
+<cite>state.marking.modified()</cite> will list which places changed
+during the last transition.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="GSPNState::current_timeC">
+double <tt class="descclassname">GSPNState::</tt><tt class="descname">current_time</tt><big>(</big><big>)</big><tt class="descclassname"> const</tt><a class="headerlink" href="#GSPNState::current_timeC" title="Permalink to this definition">¶</a></dt>
+<dd><p>The absolute time of the system.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="GSPNState::user__UserState">
+UserState <tt class="descclassname">GSPNState::</tt><tt class="descname">user</tt><a class="headerlink" href="#GSPNState::user__UserState" title="Permalink to this definition">¶</a></dt>
+<dd><p>This member is an instance of the class <cite>UserState.</cite></p>
+</dd></dl>
+
+<p>For example, an instance of the following class observes
+when the number of infected individuals within a population
+has passed a given threshold:</p>
+<div class="highlight-python"><div class="highlight"><pre>template&lt;typename GSPN&gt;
+class SIROutputFunction
+{
+public:
+  typedef void result_type;
+
+private:
+  size_t _pop_cnt;
+  size_t _ind_cnt;
+  size_t _threshold;
+  std::vector&lt;size_t&gt; _infected_per_pop;
+  std::vector&lt;double&gt; _first_passage_time;
+  std::vector&lt;bool&gt; _passed;
+
+public:
+  SIROutputFunction(size_t population_cnt,
+    size_t individuals_per_metapopulation, size_t threshold_for_passage)
+  : _pop_cnt(population_cnt), _ind_cnt(individuals_per_metapopulation),
+    _threshold(threshold_for_passage),
+    _first_passage_time(population_cnt, 0), _passed(population_cnt, false),
+    _infected_per_pop(population_cnt, 0)
+  {
+
+  }
+
+
+
+  result_type operator()(const GSPN&amp; gspn, const SIRState&amp; state)
+  {
+    auto&amp; modified=state.marking.modified();
+    for (auto place_idx : modified)
+    {
+      // Translate the internal place index into the PlaceKey
+      // used to define the GSPN when building the graph.
+      SIRPlace p=gspn.vertex_place(place_idx);
+      if (p.disease==1)
+      {
+        bool filled=(length&lt;0&gt;(state.marking, place_idx)&gt;0);
+        if (filled)
+        {
+          _infected_per_pop[p.metapop]+=1;
+          if (_infected_per_pop[p.metapop]==_threshold)
+          {
+            _first_passage_time[p.metapop]=state.current_time();
+            _passed[p.metapop]=true;
+            BOOST_LOG_TRIVIAL(info)&lt;&lt;&quot;Population &quot;&lt;&lt;p.metapop
+              &lt;&lt;&quot; at time &quot;&lt;&lt;state.current_time();
+          }
+        }
+      }
+    }
+  }
+};
+</pre></div>
+</div>
+<p>We use such an object by calling it within the main loop:</p>
+<div class="highlight-python"><div class="highlight"><pre>size_t transition_cnt=0;
+auto nothing=[](SIRState&amp;)-&gt;void {};
+for ( ;
+  std::get&lt;1&gt;(next)&lt;std::numeric_limits&lt;double&gt;::max();
+  next=propagate_competing_processes(system, nothing, rng))
+{
+  BOOST_LOG_TRIVIAL(debug) &lt;&lt; &quot;trans &quot; &lt;&lt; std::get&lt;0&gt;(next) &lt;&lt; &quot; time &quot; &lt;&lt;
+      std::get&lt;1&gt;(next);
+  ++transition_cnt;
+  output(gspn, state);
+}
+</pre></div>
+</div>
+</div>
+</div>
 
 
           </div>
@@ -351,10 +517,10 @@ to simulate a trajectory of the system.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="gspntrajectory.html" title="Simulating the Trajectory of a Semi-Markov GSPN"
+          <a href="examples.html" title="Examples"
              >next</a> |</li>
         <li class="right" >
-          <a href="mathematics.html" title="Mathematics of the Semi-Markov Model and GSPN"
+          <a href="background.html" title="Background"
              >previous</a> |</li>
         <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
           <li><a href="manual.html" >Semi-Markov Library Manual</a> &raquo;</li> 

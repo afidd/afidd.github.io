@@ -1,0 +1,780 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Examples &mdash; Semi-Markov 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
+    <link rel="up" title="Semi-Markov Library Manual" href="manual.html" />
+    <link rel="next" title="References" href="references.html" />
+    <link rel="prev" title="Tutorial" href="explicit.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="references.html" title="References"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="explicit.html" title="Tutorial"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="manual.html" accesskey="U">Semi-Markov Library Manual</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Examples</a><ul>
+<li><a class="reference internal" href="#weiss-two-state-brownion">Weiss Two-state Brownion</a></li>
+<li><a class="reference internal" href="#susceptible-infected-recovered">Susceptible-Infected-Recovered</a><ul>
+<li><a class="reference internal" href="#the-model">The Model</a><ul>
+<li><a class="reference internal" href="#states-and-transitions">States and Transitions</a></li>
+<li><a class="reference internal" href="#grouping-transitions">Grouping Transitions</a></li>
+<li><a class="reference internal" href="#further-complications">Further Complications</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation-of-case-3">Implementation of Case 3</a><ul>
+<li><a class="reference internal" href="#define-types">Define Types</a></li>
+<li><a class="reference internal" href="#create-instances">Create Instances</a></li>
+<li><a class="reference internal" href="#initializing-the-state">Initializing the State</a></li>
+<li><a class="reference internal" href="#outputfunction-for-measurement">OutputFunction for Measurement</a></li>
+<li><a class="reference internal" href="#create-an-exact-dynamics">Create an Exact Dynamics</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation-of-case-1">Implementation of Case 1</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="explicit.html"
+                        title="previous chapter">Tutorial</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="references.html"
+                        title="next chapter">References</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/examples.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="weiss-two-state-brownion">
+<h2>Weiss Two-state Brownion<a class="headerlink" href="#weiss-two-state-brownion" title="Permalink to this headline">¶</a></h2>
+<p>In the preface to his classic book on semi-Markov
+processes <a class="reference internal" href="references.html#howard-1971" id="id1">[Howard:1971]</a>, Howard offers the following guidance
+to readers:</p>
+<blockquote class="epigraph">
+<div><em>It is often said that good ideas are simple; the Markov
+process is no exception.  In fact there is no problem in
+this book that cannot be made clear to a child.  The
+device we use to make such expositions simple is a pond
+covered by lily pads among which a frog may jump.
+Although his jumps may be random, the frog never falls
+into the water...it should be helpful to all readers to
+discuss each chapter using the lily pond analogy.</em></div></blockquote>
+<p>While one may question Howard&#8217;s view of the abstract reasoning
+capabilities of children, his advice about frogs and lily pads is
+sound. The Two-state Brownion model described by Weiss is that
+of a frog on lily pads, where the frog may be sleeping or awake.</p>
+<p>Imagine a pond with a frog jumping among seven lily pads as in Figure
+<a class="reference internal" href="#pond"><em>Figure 3.  Location of lily pads in a hypothetical pond.</em></a>.  The probability of jumping to pad <span class="math">\(i\)</span> at or
+before time <span class="math">\(t=\tau\)</span> given that the frog arrived at pad <span class="math">\(j\)</span>
+at <span class="math">\(t=0\)</span> is given by</p>
+<div class="math">
+\[C_{ij}(\tau) = q_{ij} H_{ij}(\tau)\]</div>
+<p>where <span class="math">\(q_{ij}\)</span> is marginal probability of jumping from pad
+<span class="math">\(j\)</span> to pad <span class="math">\(i\)</span> at any time and <span class="math">\(H_{ij}(\tau)\)</span> is the
+conditional distribution of jump times given that the frog arrived at
+pad <span class="math">\(j\)</span> at <cite>t=0</cite> and the destination will be pad <span class="math">\(j\)</span>.  It
+is convenient to assume that the frog will actually move at every
+jump, i.e.,</p>
+<div class="math">
+\[\sum_{k\ne j} q_{kj} = 1\]</div>
+<p>and <span class="math">\(q_{jj} = 0\)</span>.</p>
+<div class="figure align-center" id="pond">
+<a class="reference internal image-reference" href="_images/pond.svg"><img src="_images/pond.svg" /></a>
+<p class="caption">Figure 3.  Location of lily pads in a hypothetical pond.</p>
+</div>
+<p>Implementation of
+the <a class="reference external" href="weiss.pdf">Weiss two state Brownion example</a> is in a separate PDF.</p>
+</div>
+<div class="section" id="susceptible-infected-recovered">
+<h2>Susceptible-Infected-Recovered<a class="headerlink" href="#susceptible-infected-recovered" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-model">
+<h3>The Model<a class="headerlink" href="#the-model" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s take a paradigmatic system, a set of <span class="math">\(N\)</span> individuals whose
+disease states can be susceptible, infected, or recovered (SIR).
+Each individual can infect those other individuals with whom they
+have contact, as defined by a contact graph with <span class="math">\(M\le N(N-1)\)</span>
+directed edges. The hazard rate for infecting
+a neighboring individual, where a neighbor is a neighbor in the contact
+graph, is <span class="math">\(\beta_i(t-t_e)\)</span>, where <span class="math">\(i\)</span> is the individual and
+<span class="math">\(t_e\)</span> is the moment the
+moment the first individual became infected. The hazard rate for recovery
+of an individual is <span class="math">\(\gamma_i(t-t_e)\)</span>, where <span class="math">\(t_e\)</span> is the moment
+the individual first becomes infected.
+This model doesn&#8217;t include varying susceptibilities for infection.</p>
+<p>We will walk through the decision-making process for construction of
+a GSPN to simulate a trajectory of this system for different conditions.
+We can think of the complexity in three steps.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Identical individuals, exponentially-distributed transitions</li>
+<li>Unique individuals, exponentially-distributed transitions</li>
+<li>Unique individuals, arbitrarily-distributed transitions</li>
+</ul>
+</div></blockquote>
+<div class="section" id="states-and-transitions">
+<h4>States and Transitions<a class="headerlink" href="#states-and-transitions" title="Permalink to this headline">¶</a></h4>
+<p>The first step is to identify the states and transitions
+possible in the model. The marking of the GSPN can represent the
+same system state multiple ways, among which we choose according
+to requirements for calculating transitions. Some possible representations
+of the state:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Each individual&#8217;s state is <span class="math">\(p_i\)</span> where <span class="math">\(p_i\in(S,I,R)\)</span>.</li>
+<li>A list of individuals in each state, <span class="math">\((n_S, n_I, n_R)\)</span>.</li>
+<li>A presence-absence count for each individual in each state,
+<span class="math">\(p_{iS}\in(0,1)\)</span>, <span class="math">\(p_{iI}\in(0,1)\)</span>, <span class="math">\(p_{iR}\in(0,1)\)</span>.</li>
+</ol>
+</div></blockquote>
+<p>Each of these corresponds to a different data structure used to
+store the model&#8217;s marking.</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first"><span class="math">\(N\)</span> tokens, each with the the value <span class="math">\((S,I,R)\)</span>, where each
+token sits, for all time, at a place for each individual. A token would
+hold <span class="math">\((1,0,0)\)</span>, or <span class="math">\((0,1,0)\)</span>, or <span class="math">\((0,0,1)\)</span>.</p>
+<a class="reference internal image-reference" href="_images/metapopsir.svg"><img alt="Three individuals with state (S,I,R) and infection and recovery transitions." src="_images/metapopsir.svg" width="300px" /></a>
+</li>
+<li><p class="first">Three places, one for each of  <span class="math">\((n_S, n_I, n_R)\)</span>, which contain
+a list of individuals in the state associated with that place.
+Each token at place <span class="math">\(S\)</span>
+would contain the ID of an individual. Moving tokens then changes the
+individual&#8217;s disease state.</p>
+<a class="reference internal image-reference" href="_images/sirnonexponential.svg"><img alt="Three places, with three infection transitions and three recoveries." src="_images/sirnonexponential.svg" width="400px" /></a>
+</li>
+<li><p class="first">A token with no internal state. There are <span class="math">\(3N\)</span> places, one for
+each combination of individual and disease state, <span class="math">\((i, SIR)\)</span>.
+The image below shows infections between individuals 1 and 2 and
+between 2 and 3, but not between 1 and 3.</p>
+<a class="reference internal image-reference" href="_images/sirindividual.svg"><img alt="Nine places with three recoveries, showing four of the six infection transitions." src="_images/sirindividual.svg" width="300px" /></a>
+</li>
+</ol>
+</div></blockquote>
+<p>If we enumerate every possible transition in this system, for
+every possible initial marking, there are <span class="math">\(M\)</span> infection transitions
+and <span class="math">\(N\)</span> recovery transitions. Any particular infection transition
+needs to answer two questions, what is its distribution if it&#8217;s enabled,
+and what does it do when it fires? The pseudocode for a transition class
+has these two methods:</p>
+<div class="highlight-python"><div class="highlight"><pre>Enabled(UserState s, LocalMarking lm, double te, double t0)-&gt;(bool, distribution)
+{
+  // examine local marking.
+  return (is_enabled, distribution_object);
+}
+
+Fire(UserState s, LocalMarking lm, double t0, RandGen rng)-&gt;void
+{
+  // change the local marking.
+}
+</pre></div>
+</div>
+<p>To determine enabling, it needs to know
+the state of two individuals whose indices are <span class="math">\((k,l)\)</span> and the time
+at which the first individual, <span class="math">\(k\)</span>, became infected, <span class="math">\(t_{ke}\)</span>.
+The state of the individuals must be part of the local marking, which is
+the value of the marking at the places which are ordered inputs and outputs to
+the transition within the GSPN. The framework will store automatically the
+first time step at which the transition becomes enabled and return it as
+<span class="math">\(t_e\)</span>. The framework may ask multiple times whether a transition is
+still enabled, each time setting <span class="math">\(t0\)</span> to the current system time.
+A transition which is still enabled may or may not return the same distribution
+each time it is asked. It could look at the new marking and return something
+different.</p>
+<p>For this infection transition,
+if <span class="math">\(k\)</span> is infected and <span class="math">\(l\)</span> is susceptible, then the cumulative
+distribution for this transition is</p>
+<div class="math">
+\[F(t)=1-e^{-\int_{t_e}^t\beta_k(s-t_{ke})ds}.\]</div>
+<p>We might specify this distribution as a Gamma or Weibull distribution.
+A distribution object has methods to return hazard rate, survival, or
+cumulative distribution. It isn&#8217;t one or the other.</p>
+<p>The three different ways to store the marking, listed above, therefore
+don&#8217;t inherently change the number of transitions in the system.
+What they change is the form of the calculation of enabling and of
+firing. Case 1 requires examination of the token to see its state.
+Case 2 requires finding the correct individual&#8217;s token within
+a list of tokens at the place. Case 3 requires just finding whether
+there is, or is not, a token at the place. We tend to use Case 3
+because the whole system can be specified purely by stochiometry
+of the transition, which is a count of how many tokens are needed
+at a transition&#8217;s inputs and outputs and how many are moved during
+firing.</p>
+</div>
+<div class="section" id="grouping-transitions">
+<h4>Grouping Transitions<a class="headerlink" href="#grouping-transitions" title="Permalink to this headline">¶</a></h4>
+<p>We are accustomed to seeing a diagram for SIR with
+exponentially-distributed transitions so that there are just
+three places, each of which holds a count of S, I, and R.
+This is a kind of grouped transition.</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/sirexponential.svg"><img alt="The classic SIR diagram. Three places, and two transitions, one for infection and one for recovery." height="150px" src="_images/sirexponential.svg" /></a>
+</div></blockquote>
+<p>The recovery transition in this classic diagram represents a recovery
+by any one of the infecteds. The distribution of the recovery transition
+is the distribution of firing times for the first of those recovery
+transitions that would fire. In other words, it is the minimum of
+the stochastic variables for the recovery transition of each individual.
+If we look back at the theory section, we see that, given a set
+<span class="math">\(k\)</span> of recovery transitions, the pdf of their minimum firing time is the
+derivative of the product of their survival distributions,</p>
+<blockquote>
+<div><div class="math">
+\[f(t)=\frac{d}{dt}\prod_k G_k(t, t_{ek}).\]</div>
+</div></blockquote>
+<p>Each of those survivals, <span class="math">\(G_k(t,t_{ek})\)</span>, has its own enabling time.
+This <span class="math">\(f(t)\)</span> has the same form as what we have called the waiting
+time <span class="math">\(w_i(t)\)</span> in previous discussions. When our grouped transition
+fires, it has to select one of the infected individuals to recover, and
+this is done according to the time-dependent stochastic probability,</p>
+<blockquote>
+<div><div class="math">
+\[\pi_{k}(t)=\lambda_k(t,t_{ek})\prod_k G_k(t, t_{ek})/f(t)\]</div>
+</div></blockquote>
+<p>When the grouped transition fires, it has to look at the time at which
+it fires, calculate <span class="math">\(\pi_{k}(t)\)</span> for each sub-transition to create
+a probability mass function, and choose among them in order to decide which
+individual&#8217;s state it should change from I to R. Calculation of the waiting
+time and time-dependent stochastic probability can be done in closed form
+only for some very particular situations, most commonly that the
+transition distributions are all exponential. In that case,
+the cumulative waiting time is</p>
+<blockquote>
+<div><div class="math">
+\[W(t)=1-e^{-\sum_k \gamma_k t}\]</div>
+</div></blockquote>
+<p>where <span class="math">\(\gamma_k\)</span> is the constant parameter of the exponential
+distribution, and the stochastic probability is time-independent</p>
+<blockquote>
+<div><div class="math">
+\[\pi_i(t)=\frac{\gamma_i}{\sum_k \gamma_k}.\]</div>
+</div></blockquote>
+<p>Further, if we choose not to track individuals uniquely through the
+whole of the simulation, then we can skip selection of the correct
+individual to recover and store susceptibles and infecteds just as
+a total count.</p>
+<p>The exponential distribution isn&#8217;t the only one that can be grouped,
+however. The main problem with simulation of non-exponential models
+for SIR is that the representation grows as <span class="math">\(M=N(N-1)\)</span>. If we
+model each susceptible as having the same susceptibility to infection,
+then we can create
+a single infection transition for all of the susceptibles infected
+by any infected.</p>
+<blockquote>
+<div><div class="math">
+\[w(t)=nG_k(t,t_{ek})^{n-1}\frac{d}{dt}G_k(t,t_{ek})\]</div>
+</div></blockquote>
+<p>This waiting time corresponds to multiplying the hazard rate
+by the current number of susceptibles. The stochastic probability mass
+function for which susceptible is chosen will always be uniform
+for this limited case.</p>
+</div>
+<div class="section" id="further-complications">
+<h4>Further Complications<a class="headerlink" href="#further-complications" title="Permalink to this headline">¶</a></h4>
+<p>We haven&#8217;t exhausted all of the ways one could choose to
+model an SIR system. For instance, if we had exponentially-distributed
+transitions and metapopulations, we could have a token containing
+a count of S, I, and R, and put one of those tokens at each place,
+where places correspond to particular metapopulations for which the
+infection and recovery rates are different. Then we can add
+metapopulation-to-metapopulation movement or infection rates.</p>
+</div>
+</div>
+<div class="section" id="implementation-of-case-3">
+<h3>Implementation of Case 3<a class="headerlink" href="#implementation-of-case-3" title="Permalink to this headline">¶</a></h3>
+<p>Let&#8217;s choose Case 3, which has a separate place for each
+pair of individual and disease state.  This is implemented
+as an example called <tt class="docutils literal"><span class="pre">sir_mixed.cpp</span></tt>.</p>
+<div class="section" id="define-types">
+<h4>Define Types<a class="headerlink" href="#define-types" title="Permalink to this headline">¶</a></h4>
+<p>The code will progress
+in two stages. First define the types, then create instances.
+First things first, let&#8217;s make a random number generator for the
+system:</p>
+<div class="highlight-python"><div class="highlight"><pre>using RandGen=std::mt19937;
+</pre></div>
+</div>
+<p>The token doesn&#8217;t need any
+internal information because the state is carried by the place:</p>
+<div class="highlight-python"><div class="highlight"><pre>struct IndividualToken {
+  IndividualToken()=default;
+};
+</pre></div>
+</div>
+<p>We have to come up with unique keys for the places and transitions.
+We could make them compact some way, but let&#8217;s be correct before
+we get fancy:</p>
+<div class="highlight-python"><div class="highlight"><pre>struct SIRPlace {
+  int64_t disease;
+  int64_t individual;
+  SIRPlace()=default;
+  SIRPlace(int64_t d, int64_t i) : disease(d), individual(i) {}
+  // Create &lt;, ==, and &lt;&lt; operators. See code.
+};
+
+
+struct SIRTKey
+{
+  int64_t ind1;
+  int64_t ind2;
+  int64_t kind;
+
+  SIRTKey()=default;
+  SIRTKey(int64_t c1, int64_t c2, int64_t k) : ind1(c1), ind2(c2), kind(k) {}
+  // Again create &lt;, ==, and &lt;&lt; operators.
+}
+</pre></div>
+</div>
+<p>The data types are overkill, but that&#8217;s fine. We established that the
+marking could be just a count of 0 or 1 tokens, but the library only
+has one way to store markings, as a list of tokens. That is sufficiently
+general. It&#8217;s called an uncolored list because we won&#8217;t select tokens by
+their ID. At this point, we need to define only the local marking,
+which is the part the transitions will see:</p>
+<div class="highlight-python"><div class="highlight"><pre>using Local=LocalMarking&lt;Uncolored&lt;IndividualToken&gt;&gt;;
+</pre></div>
+</div>
+<p>We also have the option of adding our own parameters to the overall state
+of the system for convenience. Keep in mind that, if some transition
+modifies these parameters and another one reads them, the only way to
+ensure the system remains consistent is to recalculate every transition
+distribution afterwards. For this case, we&#8217;ll put our <span class="math">\(\beta\)</span> and
+<span class="math">\(\gamma\)</span> in here.:</p>
+<div class="highlight-python"><div class="highlight"><pre>struct WithParams {
+  // Put our parameters here.
+  std::map&lt;int,double&gt; params;
+};
+</pre></div>
+</div>
+<p>We are going to be using a class called ExplicitTransition
+which is a representation of a GSPN. It&#8217;s time to create our
+transition classes. The base class for transitions needs to
+know how the marking is stored, the random number generator,
+and any additions we&#8217;ve made to the state:</p>
+<div class="highlight-python"><div class="highlight"><pre>using SIRTransition=ExplicitTransition&lt;Local,RandGen,WithParams&gt;;
+</pre></div>
+</div>
+<p>We might as well also make a shorthand for the distribution
+classes we&#8217;ll use. These are templated only because they involve
+the random number generator.:</p>
+<div class="highlight-python"><div class="highlight"><pre>using Dist=TransitionDistribution&lt;RandGen&gt;;
+using ExpDist=ExponentialDistribution&lt;RandGen&gt;;
+</pre></div>
+</div>
+<p>Now it&#8217;s time to make a transition. We saw pseudocode above.
+We expect the Enable method to examine the local marking, whose inputs
+are an ordered list of tokens containers at places, and return
+a distribution. The firing function should move those tokens.:</p>
+<div class="highlight-python"><div class="highlight"><pre>class InfectNeighbor : public SIRTransition
+{
+  virtual std::pair&lt;bool, std::unique_ptr&lt;Dist&gt;&gt;
+  Enabled(const UserState&amp; s, const Local&amp; lm,
+    double te, double t0) const override {
+    if (lm.template InputTokensSufficient&lt;0&gt;()) {
+      return {true, std::unique_ptr&lt;ExpDist&gt;(new ExpDist(s.params.at(0), te))};
+    } else {
+      return {false, std::unique_ptr&lt;Dist&gt;(nullptr)};
+    }
+  }
+
+  virtual void Fire(UserState&amp; s, Local&amp; lm, double t0,
+      RandGen&amp; rng) const override {
+    BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Fire infection &quot; &lt;&lt; lm;
+    lm.template TransferByStochiometricCoefficient&lt;0&gt;(rng);
+  }
+};
+</pre></div>
+</div>
+<p>The notation for <tt class="docutils literal"><span class="pre">lm.template</span> <span class="pre">InputTokensSufficient&lt;0&gt;()</span></tt> is a rarely-seen
+but perfectly normal (for C++) way to call the templated method
+<tt class="docutils literal"><span class="pre">InputTokensSufficient</span></tt> on the LocalMarking object.
+The template paramter, that <tt class="docutils literal"><span class="pre">&lt;0&gt;</span></tt>, says that this is the first,
+and only for this simulation, type of token. Had we defined our
+local marking with:</p>
+<div class="highlight-python"><div class="highlight"><pre>using Local=LocalMarking&lt;Uncolored&lt;IndividualToken&gt;,Uncolored&lt;OtherToken&gt;&gt;;
+</pre></div>
+</div>
+<p>then there would be a token type <tt class="docutils literal"><span class="pre">&lt;1&gt;</span></tt>. This
+transition assumes that the GSPN will be hooked together in such a
+way that there are two inputs, one from an S place, one from an I, with
+stoichiometric coefficients of -1 on each, so that the <tt class="docutils literal"><span class="pre">InputTokensSufficient</span></tt>
+method can just count the tokens to determine if the transition is enabled.
+We could, alternatively, do the work ourselves:</p>
+<div class="highlight-python"><div class="highlight"><pre>class InfectNeighbor : public SIRTransition
+{
+  virtual std::pair&lt;bool, std::unique_ptr&lt;Dist&gt;&gt;
+  Enabled(const UserState&amp; s, const Local&amp; lm,
+    double te, double t0) const override {
+    int have_i=lm.template Length&lt;0&gt;(0)&gt;0;
+    int have_s=lm.template Length&lt;0&gt;(1)&gt;0;
+    if (have_i &amp;&amp; have_s) {
+      return {true, std::unique_ptr&lt;ExpDist&gt;(new ExpDist(s.params.at(0), te))};
+    } else {
+      return {false, std::unique_ptr&lt;Dist&gt;(nullptr)};
+    }
+  }
+
+  virtual void Fire(UserState&amp; s, Local&amp; lm, double t0,
+      RandGen&amp; rng) const override {
+    // Move from input place 1 to place 3 (output) one token.
+    lm.template Move&lt;0&gt;(1, 3, 1);
+  }
+};
+</pre></div>
+</div>
+<p>This version assumes the first place is the infector, the second
+place the susceptible, and the fourth place the newly-infected token&#8217;s place.
+We ensure our assumptions are correct when constructing the
+GSPN later. The ExplicitTransitions representation is itself
+parameterized:</p>
+<div class="highlight-python"><div class="highlight"><pre>using SIRGSPN=
+  ExplicitTransitions&lt;SIRPlace, SIRTKey, Local, RandGen, WithParams&gt;;
+</pre></div>
+</div>
+<p>We created a <tt class="docutils literal"><span class="pre">LocalMarking</span></tt> with which a transition can grab
+tokens from places to which it is connected in the GSPN. The
+ExplicitTransitions will create its own set of internal keys
+for the places and transitions, so that the <tt class="docutils literal"><span class="pre">Marking</span></tt> used
+by the system uses this set. It&#8217;s an annoyance, but it lets the
+code create more efficient graph structures. Because of this,
+we ask the <tt class="docutils literal"><span class="pre">ExplicitTransitions</span></tt> object how it annotates places
+for the <tt class="docutils literal"><span class="pre">Marking</span></tt> storage.:</p>
+<div class="highlight-python"><div class="highlight"><pre>using Mark=Marking&lt;SIRGSPN::PlaceKey, Uncolored&lt;IndividualToken&gt;&gt;;
+</pre></div>
+</div>
+<p>The state of the system is now the marking, the enabling times
+of all transitions, and our little bit of user state we threw in:</p>
+<div class="highlight-python"><div class="highlight"><pre>using SIRState=GSPNState&lt;Mark,SIRGSPN::TransitionKey,WithParams&gt;;
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-instances">
+<h4>Create Instances<a class="headerlink" href="#create-instances" title="Permalink to this headline">¶</a></h4>
+<p>We&#8217;ve made types to represent the parts of the GSPN, but we
+haven&#8217;t made the GSPN instance yet. There is a builder object to
+do this for us:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">BuildGraph</span><span class="o">&lt;</span><span class="n">SIRGSPN</span><span class="o">&gt;</span> <span class="n">bg</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>We take this builder object and add all of the places and
+then all of the transitions, which are connected to those
+places. Remember from above that the order matters, because
+that order is how a transition knows to access its local marking.
+When building the GSPN, each place is created by its PlaceKey.
+Each transition is identified by its transition key, then
+the list of edges to places, where each edge has stoichiometry,
+and finally by including the transition object itself.
+Look for places as a pair of (disease state, individual) and
+for transitions as a triple of (individual, individual, reaction_kind).:</p>
+<div class="highlight-python"><div class="highlight"><pre>SIRGSPN
+BuildSystem(int64_t individual_cnt)
+{
+BuildGraph&lt;SIRGSPN&gt; bg;
+using Edge=BuildGraph&lt;SIRGSPN&gt;::PlaceEdge;
+
+enum { s, i, r };
+
+for (int64_t ind_idx=0; ind_idx&lt;individual_cnt; ind_idx++) {
+  for (int64_t place : std::vector&lt;int&gt;{s, i, r}) {
+    bg.AddPlace({place, ind_idx}, 0);
+  }
+}
+
+for (int64_t left_idx=0; left_idx&lt;individual_cnt-1; left_idx++) {
+  bg.AddTransition({left_idx, left_idx, 0},
+    {Edge{{i, left_idx}, -1}, Edge{{r, left_idx}, 1}},
+    std::unique_ptr&lt;SIRTransition&gt;(new Recover())
+    );
+
+  for (int64_t right_idx=left_idx+1; right_idx&lt;individual_cnt; right_idx++) {
+    SIRPlace left{i, left_idx};
+    SIRPlace rights{s, right_idx};
+    SIRPlace righti{i, right_idx};
+
+    bg.AddTransition({left_idx, right_idx, 0},
+      {Edge{left, -1}, Edge{rights, -1}, Edge{left, 1}, Edge{righti, 1}},
+      std::unique_ptr&lt;SIRTransition&gt;(new InfectNeighbor()));
+
+    SIRPlace lefts{s, left_idx};
+    SIRPlace lefti{i, left_idx};
+    SIRPlace right{i, right_idx};
+
+    bg.AddTransition({right_idx, left_idx, 0},
+      {Edge{right, -1}, Edge{lefts, -1}, Edge{right, 1}, Edge{lefti, 1}},
+      std::unique_ptr&lt;SIRTransition&gt;(new InfectNeighbor()));
+  }
+}
+return std::move(bg.Build());
+}
+</pre></div>
+</div>
+<p>The use of <tt class="docutils literal"><span class="pre">unique_ptr</span></tt> helps us avoid memory leaks.
+We&#8217;ve build a GSPN. Now what? We need to create an
+initial marking and to run the system.</p>
+</div>
+<div class="section" id="initializing-the-state">
+<h4>Initializing the State<a class="headerlink" href="#initializing-the-state" title="Permalink to this headline">¶</a></h4>
+<p>We already made an <tt class="docutils literal"><span class="pre">SIRState</span></tt> type. We can create it and
+initialize our <tt class="docutils literal"><span class="pre">WithParams</span></tt> extra state.:</p>
+<div class="highlight-python"><div class="highlight"><pre>SIRState state;
+state.user.params[0]=beta;
+state.user.params[1]=gamma;
+</pre></div>
+</div>
+<p>More interesting is creating our first individuals in susceptible
+states and making one of them an infected. The <tt class="docutils literal"><span class="pre">Marking</span></tt> doesn&#8217;t
+use the same <tt class="docutils literal"><span class="pre">SIRKey</span></tt> that we defined, so we have to translate our
+keys and then add the token to the marking with a free function <tt class="docutils literal"><span class="pre">Add</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre>for (int64_t individual=0; individual&lt;individual_cnt; ++individual) {
+  auto susceptible=gspn.PlaceVertex({0, individual});
+  Add&lt;0&gt;(state.marking, susceptible, IndividualToken{});
+}
+</pre></div>
+</div>
+<p>We want one of those to be an infected. Here&#8217;s a complicated way to
+initialize the infected. Move a token from susceptible to infected,
+after first choosing one at random.:</p>
+<div class="highlight-python"><div class="highlight"><pre>// The initial input string moves a token from susceptible to infected.
+auto first_case=static_cast&lt;int64_t&gt;(
+    smv::uniform_index(rng, individual_cnt));
+BOOST_LOG_TRIVIAL(trace)&lt;&lt;&quot;First case is &quot;&lt;&lt;first_case;
+int64_t first_s=gspn.PlaceVertex({0, first_case});
+int64_t first_i=gspn.PlaceVertex({1, first_case});
+auto input_string=[&amp;first_s, &amp;first_i](SIRState&amp; state)-&gt;void {
+  Move&lt;0,0&gt;(state.marking, first_s, first_i, 1);
+};
+input_string(state);
+</pre></div>
+</div>
+<p>The template <tt class="docutils literal"><span class="pre">&lt;0,0&gt;</span></tt> says that this is moving the <tt class="docutils literal"><span class="pre">Uncolored&lt;SIRToken&gt;</span></tt>
+specified first in the list of token types to the local marking.</p>
+<p>We have now made everything necessary to describe the model.
+This model could be run in continuous time or discrete time.
+It could be run with any number of exact algorithms or inexact
+algorithms. We next instantiate an exact algorithm in
+continuous time to which we will hand our model.</p>
+</div>
+<div class="section" id="outputfunction-for-measurement">
+<h4>OutputFunction for Measurement<a class="headerlink" href="#outputfunction-for-measurement" title="Permalink to this headline">¶</a></h4>
+<p>We need to see some results. An output object will look
+at changes to the state of the system and record what
+happens. This object&#8217;s methods are very general and take
+a simple form.:</p>
+<div class="highlight-python"><div class="highlight"><pre>template&lt;typename SIRState&gt;
+struct SIROutput
+{
+  int64_t step_cnt{0};
+
+  void operator()(const SIRState&amp; state) {
+    ++step_cnt;
+    BOOST_LOG_TRIVIAL(debug) &lt;&lt; &quot;trans &quot; &lt;&lt; state.last_transition
+        &lt;&lt; &quot; time &quot; &lt;&lt; state.CurrentTime() &lt;&lt; &quot; step &quot; &lt;&lt; step_cnt;
+    BOOST_LOG_TRIVIAL(trace) &lt;&lt; state.marking;
+  }
+
+  void final(const SIRState&amp; state) {
+    BOOST_LOG_TRIVIAL(info) &lt;&lt; &quot;Took &quot;&lt;&lt; step_cnt &lt;&lt; &quot; transitions.&quot;;
+  }
+};
+</pre></div>
+</div>
+<p>The trick to writing one of these is to look up in the
+reference section what&#8217;s in the state. You&#8217;ll find the
+current time, the last transition, and, of course, the user-added
+parameters, which can include any recorded information you like
+to add during firing of a transition.</p>
+</div>
+<div class="section" id="create-an-exact-dynamics">
+<h4>Create an Exact Dynamics<a class="headerlink" href="#create-an-exact-dynamics" title="Permalink to this headline">¶</a></h4>
+<p>This library currently implements just a few ways to take
+the model and find the next step. There are two pieces to
+this. The <tt class="docutils literal"><span class="pre">StochasticDynamics</span></tt> collects all enabled transitions
+into a list and presents them to a <tt class="docutils literal"><span class="pre">Propagator</span></tt> which then
+uses statistical methods to choose among the list of transitions:</p>
+<div class="highlight-python"><div class="highlight"><pre>using Propagator=NonHomogeneousPoissonProcesses&lt;int64_t,RandGen&gt;;
+Propagator competing;
+using Dynamics=StochasticDynamics&lt;SIRGSPN,SIRState,RandGen&gt;;
+Dynamics dynamics(gspn, {&amp;competing});
+</pre></div>
+</div>
+<p>The various propagators are stronger or weaker at dealing with
+the different types of distributions. This one, the
+<tt class="docutils literal"><span class="pre">NonHomogeneousPoissonProcesses</span></tt> propagator, works best
+with distributions which specify a hazard rate. It uses
+Anderson&#8217;s algorithm underneath. The
+<tt class="docutils literal"><span class="pre">PropagateCompetingProcesses</span></tt> propagator uses a simpler
+and much slower First Reaction method.</p>
+<p>Because the next time step is determined by the mathematically-defined
+minimum of the stochastic variables, we can just hand our
+GSPN object to the dynamics and ask it for the next step.:</p>
+<div class="highlight-python"><div class="highlight"><pre>dynamics.Initialize(&amp;state, &amp;rng);
+
+bool running=true;
+while (running) {
+  running=dynamics(state);
+  output_function(state);
+}
+output_function.final(state);
+</pre></div>
+</div>
+<p>We can stop the loop at any point, but it will return
+that it is not running at any point when there are no
+enabled transitions.</p>
+</div>
+</div>
+<div class="section" id="implementation-of-case-1">
+<h3>Implementation of Case 1<a class="headerlink" href="#implementation-of-case-1" title="Permalink to this headline">¶</a></h3>
+<p>If we were to implement the first representation of the
+state, where each token has the value <span class="math">\((s,i,r)\)</span>,
+how would we define the tokens and transitions?
+The token itself is just a struct.:</p>
+<div class="highlight-python"><div class="highlight"><pre>struct MetaToken {
+  int s;
+  int i;
+  int r;
+  MetaToken()=default;
+  MetaToken(int s, int i, int r) : s(s), i(i), r(r) {}
+};
+</pre></div>
+</div>
+<p>More interesting are the transitions. How do we grab
+and read or modify the token? We have to look inside the
+token in the local marking. This is done by applying a function
+to the token. We pass into the local marking a functor, but
+the local marking returns two things, whether it found
+a token and then the result of the functor.:</p>
+<div class="highlight-python"><div class="highlight"><pre>class Infect : public MetaTransition {
+  virtual std::pair&lt;bool, std::unique_ptr&lt;Dist&gt;&gt;
+  Enabled(const UserState&amp; s, const Local&amp; lm, double te,
+      double t0) const override {
+    bool found;
+    bool have_infector;
+    std::tie(found, have_infector)=
+      lm.template GetToken&lt;0&gt;(0, [](const MetaToken&amp; mt)-&gt;bool {
+        return mt.i&gt;0;
+      });
+    assert(found);
+    bool have_susceptible;
+    std::tie(found, have_susceptible)=
+      lm.template GetToken&lt;0&gt;(1, [](const MetaToken&amp; mt)-&gt;bool {
+        return mt.s&gt;0;
+      });
+    assert(found);
+    if (have_infector &amp;&amp; have_susceptible) {
+      return {true, std::unique_ptr&lt;ExpDist&gt;(new ExpDist(s.params.at(1), te))};
+    }
+  };
+
+  virtual void Fire(UserState&amp; s, Local&amp; lm, double t0,
+      RandGen&amp; rng) const override {
+    int from_place=1;
+    int to_place=1;
+    int token_cnt=1;
+    lm.template Move&lt;0,0&gt;(from_place, to_place, token_cnt,
+      [](MetaToken&amp; mt)-&gt;void {
+      assert(mt.s==1 &amp;&amp; mt.i==0);
+      mt.i=1;
+      mt.s=0;
+    });
+  }
+};
+</pre></div>
+</div>
+<p>We are still checking for a susceptible and an infected to determine
+enabling, and then the firing transition moves a susceptible into
+an infected state. It just does it by modifying the token
+rather than moving the token to a place.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="references.html" title="References"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="explicit.html" title="Tutorial"
+             >previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="manual.html" >Semi-Markov Library Manual</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Andrew Dolgert, David Schneider.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Background &mdash; Semi-Markov 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
+    <link rel="up" title="Semi-Markov Library Manual" href="manual.html" />
+    <link rel="next" title="Tutorial" href="explicit.html" />
+    <link rel="prev" title="Requirements and Installation" href="install.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="explicit.html" title="Tutorial"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Requirements and Installation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="manual.html" accesskey="U">Semi-Markov Library Manual</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Background</a><ul>
+<li><a class="reference internal" href="#the-hazard-from-survival-analysis">The Hazard from Survival Analysis</a><ul>
+<li><a class="reference internal" href="#discrete-case">Discrete case</a></li>
+<li><a class="reference internal" href="#continuous-case">Continuous case</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#finite-state-machines-generate-trajectories">Finite State Machines Generate Trajectories</a></li>
+<li><a class="reference internal" href="#markov-chain-for-discrete-time-trajectories">Markov Chain for Discrete-Time Trajectories</a></li>
+<li><a class="reference internal" href="#markov-process-for-continuous-time-trajectories">Markov Process for Continuous-Time Trajectories</a></li>
+<li><a class="reference internal" href="#generalized-stochastic-petri-net-for-bookkeeping">Generalized Stochastic Petri Net for Bookkeeping</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">Requirements and Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="explicit.html"
+                        title="next chapter">Tutorial</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/background.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="background">
+<h1>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h1>
+<p>This addresses two main points, how to specify a model for
+the library using distributions defined by hazards and
+why such a specification, with its initial conditions,
+is sufficient to define the trajectory for a model.</p>
+<div class="section" id="the-hazard-from-survival-analysis">
+<h2>The Hazard from Survival Analysis<a class="headerlink" href="#the-hazard-from-survival-analysis" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="discrete-case">
+<h3>Discrete case<a class="headerlink" href="#discrete-case" title="Permalink to this headline">¶</a></h3>
+<p>The discrete case is much easier to understand than the continuous
+case because it can be explained without employing any results from
+calculus.  Throughout this section, <span class="math">\(\bf{X}\)</span> will be assumed to
+real-valued random variable.  For example, <span class="math">\(\bf{X}\)</span> could
+represent latent periods for measles.</p>
+<p>It frequently happens that random samples of the real valued variables
+such as <span class="math">\(\bf{X}\)</span> are actually analyzed on a discrete scale.
+For example Stocks&#8217; data on latent periods of measles in
+<a class="reference internal" href="intro.html#latent-period"><em>Figure 1.  Distribution of latent periods for measles in London
+circa 1931</em></a> is based on daily visits by patients.</p>
+<p>The (cumulative) distribution of <span class="math">\(\bf{X}\)</span> is defined as</p>
+<div class="math">
+\[F_{X}(k) = \mathcal{P}[x \le k]\]</div>
+<p>assuming <span class="math">\(F_{X}(\infty) = 1\)</span>.  The
+density can be expressed as the difference in adjacent values of the
+distribution</p>
+<div class="math">
+\[\begin{eqnarray}
+f_{X}(k) & = & \mathcal{P}[X=k] \\
+         & = & \mathcal{P}[X\le k] - \mathcal{P}[X \le k-1 ] \\
+         & = & F_{X}(k) - F_{X}(k-1)
+\end{eqnarray}\]</div><p>For Stocks&#8217; data in <a class="reference internal" href="intro.html#latent-period"><em>Figure 1.  Distribution of latent periods for measles in London
+circa 1931</em></a>, the density at day <span class="math">\(k\)</span>
+should be interpreted as the probability of the appearance of symptoms
+since the previous visit on day <span class="math">\(k-1\)</span>.</p>
+<p>The <em>hazard</em> is defined as the conditional probability that the value
+of a random selection from <span class="math">\(\bf{X}\)</span> equals <span class="math">\(k\)</span> given it
+this value is already known to exceed <span class="math">\(k-1\)</span>.  Using the usual
+rules for computing conditional probabilities, the hazard is given by
+the following ratio</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray}
+h_{X}(k) &amp; = &amp; \mathcal{P}[X=k\; |\; k-1&lt;X] \\
+         &amp; = &amp; {\frac{f_{X}(k)}{1 - F_{X}(k-1)}}
+\end{eqnarray}\end{split}\]</div>
+<p>In the case of Stocks&#8217; data, the hazards shown in
+<a class="reference internal" href="#latent-period-hazard"><em>Figure 2.  Estimated hazards of latent periods for measles in
+London circa 1931</em></a> would correspond to the probability of
+symptoms appearing at day <span class="math">\(k\)</span> given that the patient had not
+displayed symptoms at any previous visit.  As time goes on, patients
+who have already developed symptoms effectively reduce the pool of
+patients in the study who are still in a state where they might first
+present symptoms on day <span class="math">\(k\)</span>.  This is the origin of the term in
+the denominator.</p>
+<div class="figure align-center" id="latent-period-hazard">
+<a class="reference internal image-reference" href="_images/Stocks_hazard.svg"><img src="_images/Stocks_hazard.svg" width="500px" /></a>
+<p class="caption">Figure 2.  Estimated hazards of latent periods for measles in
+London circa 1931</p>
+</div>
+<p>On any given day, the hazard for latent periods can be interpreted as
+the rate of appearance of symptoms per asymptomatic (infected but not
+yet symptomatic) patient per day.  For example, the hazard inferred
+from the Weibull distribution is approximately <span class="math">\(0.15\)</span> on day 10.
+In other words, 15% of the patients that are asymptomatic on day 9
+will present symptoms when examined on day 10.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/stocks_person.svg"><img src="_images/stocks_person.svg" width="200px" /></a>
+<p class="caption">Figure 3. Each participant of the Stocks study could either
+become symptomatic or leave the study. Focusing on the
+hazard accounts for the effect of those who leave.</p>
+</div>
+<p>This interpretation is extremely important because it connects a
+hazard with a rate for a specific process, and that rate has well
+defined units of measurement.  In addition, it clarifies how rate
+parameters should be estimated from observational data.  Failure to
+account for the shrinking pool over time is commonplace.  In this case
+it would lead to a systematic errors in the estimation of process
+rates, especially at long times when the depletion effect is most
+pronounced.</p>
+</div>
+<div class="section" id="continuous-case">
+<h3>Continuous case<a class="headerlink" href="#continuous-case" title="Permalink to this headline">¶</a></h3>
+<p>The random variable <span class="math">\(\bf{X}\)</span> is again assumed to be a
+real-valued, but the measurements will not be binned as above.
+The cumulative distribution not an integer <span class="math">\(k\)</span> but a continuous
+time interval, <span class="math">\(\tau\)</span>.</p>
+<div class="math">
+\[F_X(\tau)=P[x\le\tau]\]</div>
+<p>assuming <span class="math">\(F_X(\infty)=1\)</span>. The density is the derivative
+of the cumulative distribution. The concept of the hazard is
+part of survival analysis, where survival is
+<span class="math">\(G_X(\tau)=1-F_X(\tau)\)</span>, and represents the probability
+the random variable, a time interval, is longer than <span class="math">\(\tau\)</span>.
+One expression for the hazard is that the density of the random
+variable is equal to the probability it survives to a time <span class="math">\(\tau\)</span>
+multiplied by the hazard rate for firing at time <span class="math">\(\tau\)</span>, or, in
+probabilities,</p>
+<div class="math">
+\[\begin{split}P[\tau&lt;x\le\tau+d\tau]d\tau=P[\tau&lt;x]P[\tau&lt;x\le\tau+d\tau+d\tau|\tau&lt;x].\end{split}\]</div>
+<p>Writing this same equation with its almost-sure equivalents defines
+the continuous hazard, <span class="math">\(\lambda_X(\tau)\)</span>,</p>
+<div class="math">
+\[f_X(\tau)=G_X(\tau)\lambda_X(\tau).\]</div>
+<p>This is a rearrangement away from the definition of the discrete case.</p>
+</div>
+</div>
+<div class="section" id="finite-state-machines-generate-trajectories">
+<h2>Finite State Machines Generate Trajectories<a class="headerlink" href="#finite-state-machines-generate-trajectories" title="Permalink to this headline">¶</a></h2>
+<p>This library accepts a specification of a model in terms of
+hazards, an initial condition, and produces trajectories.
+This set of high-level steps to simulation (specify, initialize,
+step) has a well-defined abstraction called a <em>finite state machine.</em>
+It isn&#8217;t the finite state machine familiar to programmers but a
+mathematical model, coming from category theory, for a particularly
+simple class of computing systems.  At a conceptual level, a finite
+state machine can be considered a black box that receives a sequence
+of input signal and produces an output signal for each input signal.
+Internally, the black box maintains a <em>state</em> &#8211; some sort of finite
+summary representation of the sequence of input signals encountered so
+far.  For each input signal, the box performs two operations.  In both
+cases, the decision depends on the current internal state and the
+identity of the input signal just received.</p>
+<ul class="simple">
+<li><strong>Chose next state</strong></li>
+<li><strong>Generate output token</strong></li>
+</ul>
+<p>It is helpful to view the finite state machine layer as a mechanism to
+simulate a <em>Markov chain</em> or <em>Markov process</em>.</p>
+</div>
+<div class="section" id="markov-chain-for-discrete-time-trajectories">
+<h2>Markov Chain for Discrete-Time Trajectories<a class="headerlink" href="#markov-chain-for-discrete-time-trajectories" title="Permalink to this headline">¶</a></h2>
+<p>Roughly speaking, a <em>Markov chain</em>, <span class="math">\(\bf{X}\)</span>, is a probabilistic
+system that makes random jumps among a finite set of distinct states,
+<span class="math">\(s_0, s_1, s_2, \ldots, s_N\)</span> such that the probability of
+choosing the next state, <span class="math">\(X_{n+1}\)</span> depends only on the current
+state, <span class="math">\(X_n\)</span>.  In mathematical terms, the conditional
+probabilities for state transitions must satisfy</p>
+<div class="math">
+\[\mathcal{P}[X_{n+1} = s_{l} | X_0=s_i, X_1=s_j, \ldots, X_n=s_k] =
+\mathcal{P}[X_{n+1} = s_{l} | X_{n}=s_k]\]</div>
+<p>Since more distant history does not affect future behavior, Markov
+chains are sometimes characterized as <em>memoryless</em>.</p>
+<p>This relation can be iterated to compute
+the conditional probabilities for multiple time steps</p>
+<div class="math">
+\[\mathcal{P}[X_{n+2} = s_{m} | X_n=s_k] = \sum_{l} \mathcal{P}[X_{n+2} = s_{m} |
+X_{n+1}=s_l] \mathcal{P}[X_{n+1} = s_{l} | X_{n}=s_k]\]</div>
+<p>Note, the transition probabilities <span class="math">\(\mathcal{P}[X_{n+1} = s_{l} |
+X_{n}=s_k]\)</span> may depend on time (through the index <span class="math">\(n\)</span>).  These so-called
+time-inhomogeneous Markov chains arise when the system of interest is
+driven by external entities.  Chains with time-independent conditional
+transition probabilities are called time-homogeneous.  The dynamics of
+a time-homogeneous Markov chain is completely determined by the
+initial state and the transition probabilities.  All processes
+considered in this document are time-homogeneous.</p>
+</div>
+<div class="section" id="markov-process-for-continuous-time-trajectories">
+<h2>Markov Process for Continuous-Time Trajectories<a class="headerlink" href="#markov-process-for-continuous-time-trajectories" title="Permalink to this headline">¶</a></h2>
+<p>A <em>Markov process</em> is a generalization of
+the Markov chain such that time is viewed as continuous rather than
+discrete.  As a result, it makes sense to record the times at which
+the transitions occur as part of the process itself.</p>
+<p>The first step in this generalization is to define a stochastic
+process <span class="math">\(\bf{Y}\)</span> that includes the transition times as well as
+the state, <span class="math">\(Y_{n} = (s_{j},t_{n})\)</span>.</p>
+<p>The second step is to treat time on a truly continuous basis by
+defining a new stochastic process, <span class="math">\(\bf{Z}\)</span>, from <span class="math">\(\bf{Y}\)</span>
+by the rule <span class="math">\(Z_{t} = s_k\)</span> in the time interval <span class="math">\(t_n \le t
+&lt; t_{n+1}\)</span> given <span class="math">\(Y_{n} = (s_k, t_n)\)</span> .  In other words,
+<span class="math">\(\bf{Z}_{t}\)</span> is a piecewise constant version of <span class="math">\(\bf{Y}\)</span>
+as shown in <a class="reference internal" href="#piecewise-z"><em>Figure 4.  Realization of a continuous time stochastic process and
+associated Markov chain.</em></a></p>
+<div class="figure align-center" id="piecewise-z">
+<a class="reference internal image-reference" href="_images/piecewise_Z.svg"><img src="_images/piecewise_Z.svg" /></a>
+<p class="caption">Figure 4.  <strong>Realization of a continuous time stochastic process and
+associated Markov chain.</strong></p>
+</div>
+<p>A realization of the process <span class="math">\(\bf{Y}\)</span> is defined by the closed
+diamonds (left end points) alone.  Similarly, a realization of the
+process <span class="math">\(\bf{Z}_t\)</span> is illustrated by the closed diamonds and
+line segments.  The closed and open diamonds at the ends of the line
+segment indicate that the segments include the left but not the right
+end points.</p>
+<p>The memoryless property for Markov processes is considerably more
+delicate than in the case of Markov chain because the time variable is
+continuous rather than discrete.  In the case of <span class="math">\(\bf{Y}\)</span>, the
+conditional probabilities for state transitions of must satisfy</p>
+<div class="math">
+\[\mathcal{P}[Y_{n+1} = (s_{l},t_{n+1}) | Y_0=(s_i, t_0), Y_1=(s_j, t_1),
+\ldots, Y_n=(s_k, t_n)] =
+\mathcal{P}[Y_{n+1} = (s_{l}, t_{n+1}) | Y_{n}=(s_k, t_{n})]\]</div>
+<p>The proper generalization of the requirement of time-homeogeneity
+stated previously for Markov chains is that joint probability
+be unchanged by uniform shifts in time</p>
+<div class="math">
+\[\mathcal{P}[Z_{t+\tau} | Z_{s+\tau}] = \mathcal{P}[Z_{t} | Z_{s} ]\]</div>
+<p>for <span class="math">\(0&lt;s&lt;t\)</span> and <span class="math">\(\tau &gt; 0\)</span>.  Stochastic processes with
+shift invariant state transition probabilities are called
+<em>stationary</em>.</p>
+<p>When we examined hazard rates above, we were examining the rate
+of transitions for a Markov process. The overall probability
+of the next state of the Markov process is called the core
+matrix,</p>
+<div class="math">
+\[\mathcal{P}[Z_{t} | Z_{s} ]=Q_{ij}(t_{n+1}-t_n)\]</div>
+<p>indicating a state change between the states <span class="math">\((s_i,s_j)\)</span>.
+The derivative of this is a rate,</p>
+<div class="math">
+\[q_{ij}(t_{n+1}-t_n)=\frac{dQ_{ij}(t_{n+1}-t_n)}{dt},\]</div>
+<p>which is a joint distribution over states and time intervals.
+Normalization for this quantity sums over possible states
+and future times,</p>
+<div class="math">
+\[1=\int_0^\infty \sum_j  q_{ij}(s)ds.\]</div>
+<p>The survival, in terms of the core matrix, is</p>
+<div class="math">
+\[G_i(\tau)=1-\int_0^\tau \sum_k  q_{ik}(s)ds.\]</div>
+<p>This means our hazard is</p>
+<div class="math">
+\[\lambda_{ij}(\tau)=\frac{q_{ij}(\tau)}{1-\int_0^\tau \sum_k  q_{ik}(s)ds}.\]</div>
+<p>For the measles example, the set of future states <span class="math">\(j\)</span> of each individual
+include symptomatic and all the possible other ways an individual
+leaves the study, so you can think of <span class="math">\(j=\mbox{left town}\)</span>.
+In practice, we build a hazard in two steps. First, count the probability
+over all time for any one eventual state <span class="math">\(j\)</span>. This is the
+same stochastic probability <span class="math">\(\pi_{ij}\)</span> that is seen in Markov
+chains. Second, measure the distribution of times at which
+intervals enter each new state <span class="math">\(j\)</span>, given that they are headed
+to that state. This is called the holding time, <span class="math">\(h_{ij}(\tau)\)</span>,
+and is a conditional probability. Together, these two give us
+the core matrix,</p>
+<div class="math">
+\[q_{ij}(\tau)=\pi_{ij}h_{ij}(\tau).\]</div>
+<p>Note that <span class="math">\(h_{ij}(\tau)\)</span> is a density whose integral
+<span class="math">\(H_{ij}(\tau)\)</span> is a cumulative distribution. If we write the
+same equation in terms of probabilities, we see that it amounts
+to separating the Markov process into a marginal and conditional
+distribution.</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray}
+q_{ij}(\tau)&amp;=&amp;\frac{d}{d\tau}P[Z_t|Z_s]\\
+&amp;=&amp;\frac{d}{d\tau}P[s_j|s_i,t_n]P[t_{n-1}-t_n\le\tau|s_i,s_j,t_n]\\
+  &amp; = &amp; P[s_j|s_i,t_n]\frac{d}{d\tau}P[t_{n-1}-t_n\le\tau|s_i,s_j,t_n] \\
+  &amp; = &amp; \pi_{ij}\frac{d}{d\tau}H_{ij}(\tau) \\
+  &amp; = &amp; \pi_{ij}h_{ij}(\tau)
+\end{eqnarray}\end{split}\]</div>
+<p>Choosing the other option for the marginal gives us the
+waiting time formulation for the core matrix. It corresponds
+to asking first what is the distribution of times at which the
+next event happens, no matter which event, and then asking
+which events are more likely given the time of the event.</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray}
+q_{ij}(\tau)&amp;=&amp;\frac{d}{d\tau}P[Z_t|Z_s]\\
+&amp;=&amp;\frac{d}{d\tau}P[s_j|s_i,t_n,t_{n+1}]P[t_{n-1}-t_n\le\tau|s_i,t_n]\\
+  &amp; = &amp; \frac{d}{d\tau}(\Pi_{ij}(\tau)W_i(\tau)) \\
+  &amp; = &amp; \pi_{ij}(\tau)\frac{d}{d\tau}W_i(\tau) \\
+  &amp; = &amp; \pi_{ij}(\tau)w_{i}(\tau)
+\end{eqnarray}\end{split}\]</div>
+<p>While the waiting time density <span class="math">\(w_i(\tau)\)</span>, is the derivative
+of the waiting time, we won&#8217;t end up needing to relation
+<span class="math">\(\pi_{ij}(\tau)\)</span> to <span class="math">\(\Pi_{ij}(\tau)\)</span> when finding trajectories
+or computing hazards, so the more complicated relationship won&#8217;t
+be a problem.</p>
+</div>
+<div class="section" id="generalized-stochastic-petri-net-for-bookkeeping">
+<h2>Generalized Stochastic Petri Net for Bookkeeping<a class="headerlink" href="#generalized-stochastic-petri-net-for-bookkeeping" title="Permalink to this headline">¶</a></h2>
+<p>A <strong>generalized stochastic Petri net</strong> (GSPN) is a formal way to
+specify a a system of interacting, competing processes. Different
+organisms can compete, but, for this system, the likelihood of
+infecting a neighbor versus the likelihood of recovery are seen as
+competing, as well.</p>
+<p>Define a system by placing <em>tokens</em> at <em>places,</em> the way you would
+put checkers on a game board. Each place represents a sub-state of
+the system, such as herd of animals. Five tokens on a place representing
+a herd means the herd has five animals.</p>
+<p><em>Transitions</em> compete to move the tokens. Each transition is
+an independent process. (We explain later how and why independent processes
+are able to represent biological processes that are clearly dependent.)
+Only transitions change the state. Each one triggers according to its
+own internal clock. This library can model non-exponential distributions
+of firing times.</p>
+<p>There are many flavors of GSPN defined by various authors.
+The following model was chosen to support complex epidemiological
+simulations while still representing a semi-Markov system.
+In brief, for those familiar with GSPN, this system supports
+non-exponential distributions, without inhibitor arcs, with
+colored tokens, without immediate transitions, permitting
+simultaneous transitions.</p>
+<p>The <strong>what</strong> of the GSPN is</p>
+<ul class="simple">
+<li>Places, <span class="math">\(p_1, p_2, p_3\ldots\)</span>.</li>
+<li>Transitions, <span class="math">\(e_1, e_2, e_3\ldots\)</span>. Each transition has
+input places, <span class="math">\(p_k\in I(e_i)\)</span> and output places,
+<span class="math">\(p_k\in J(e_i)\)</span>. For each pair of transition and input
+or output place, there is an integer stochiometric coefficient.
+There are no inhibitor places in this representation.</li>
+<li>Marking at each place, <span class="math">\(s_1, s_2, s_3\ldots\)</span>. The marking
+at a place is a non-negative number of tokens, <span class="math">\(q_i\)</span>. Tokens may
+have properties, <span class="math">\(\xi(q_i)\)</span>.</li>
+</ul>
+<p>The <strong>how</strong> of the GSPN is</p>
+<ol class="arabic">
+<li><p class="first">A transition becomes <em>enabled</em> when there are as many tokens on
+the input places as the stochiometric coefficients require.
+Whether the output places need to be empty is a policy choice.
+The enabling time of a transition is part of the state of the
+system.</p>
+</li>
+<li><p class="first">An enabled transition computes from the marking on its input
+and output places, and from any properties of the tokens in that
+marking, a continuous stochastic variable which determines the
+likelihood the transition will fire at any time in the future.
+This stochastic variable need not be an exponential distribution.</p>
+</li>
+<li><p class="first">The system samples jointly from the stochastic variables of every
+enabled transition in order to determine which transition fires
+next. This is described in grave detail later.</p>
+</li>
+<li><p class="first">When a transition fires, it removes from the marking of its input
+places the specified number of tokens and puts them in the output
+places. Any disparity in token count destroys or creates tokens.
+Which token is moved is specified by policy to be the first,
+last, or random token in the marking of the place.</p>
+</li>
+<li><p class="first">Transitions which do not fire fall into four classes. Those
+transitions whose input and output places are not shared with
+inputs and outputs of the fired transitions retain their
+enabling time and may not make any changes to how their
+continuous variable distributions depend on the marking.
+Any dependence between transitions must be expressed by
+sharing intput or output places.</p>
+<p>Those previously-enabled transitions which share input or output
+places, and for which the new marking still meets their
+enabling requirements, retain their original enabling times
+but may recalculate their stochastic variable distributions
+depending on the marking.</p>
+<p>Previously-enabled transitions whose input or output
+places no longer have requisite tokens for enabling become
+disabled.</p>
+<p>All transitions which may become enabled after the firing
+are enabled with an enabling time set to the current system
+time.</p>
+</li>
+</ol>
+<p>Each transition defines an independent continuous stochastic variable,
+whose density is <span class="math">\(f_\alpha(\tau, t_e)\)</span> and cumulative density
+is <span class="math">\(F_\alpha(\tau, t_e)\)</span>, where <span class="math">\(t_e\)</span> is the time
+at which the transition was enabled. If we define a new stochastic variable,
+whose value is the minimum of all of the <span class="math">\(f_\alpha\)</span>, then it
+defines the time of the next transition, and the index <span class="math">\(\alpha\)</span> of
+the transition that came first determines, by its transition&#8217;s
+change to the marking, the new system state, <span class="math">\(j\)</span>. This means we have
+a race. The racing processes are dependent only when they modify
+shared marking.</p>
+<p>If the <span class="math">\(f_\alpha\)</span> are all exponential processes, then the minimum
+of the stochastic variates is analytically-tractable, and the result
+is exactly Gillespie&#8217;s method. Using a random number generator to sample
+each process separately would, again for exponential processes, result
+in the First Reaction method. The Next Reaction method is just another
+way to do this sampling in a statistically-correct manner, valid only
+for exponential processes.</p>
+<p>For general distributions, the non-zero part of the core matrix,
+which we will call <span class="math">\(p_{nm}(\tau)\)</span> for partial core matrix,
+right after the firing of any transition, is</p>
+<div class="math">
+\[p_{nm}(\tau)=\frac{f_\alpha(\tau,t_0,t_e)}{1-F_\alpha(\tau,t_0,t_e)}\prod_\beta(1-F_\beta(s, t_0, t_e))\]</div>
+<p>Here <span class="math">\((n,m)\)</span> label states determined by how each transition, <span class="math">\(\alpha\)</span>
+changes the marking. The system has, inherently, a core matrix, but we
+compute its trajectory from this partial core matrix.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="explicit.html" title="Tutorial"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Requirements and Installation"
+             >previous</a> |</li>
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
+          <li><a href="manual.html" >Semi-Markov Library Manual</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Andrew Dolgert, David Schneider.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

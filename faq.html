@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
-    <link rel="prev" title="Continuous Distributions Reference" href="distributions.html" /> 
+    <link rel="prev" title="Dynamics Reference" href="dynamics.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,7 +35,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="distributions.html" title="Continuous Distributions Reference"
+          <a href="dynamics.html" title="Dynamics Reference"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
       </ul>
@@ -46,13 +46,14 @@
   <ul>
 <li><a class="reference internal" href="#">Semi-Markov Library FAQ</a><ul>
 <li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#code-style">Code Style</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="distributions.html"
-                        title="previous chapter">Continuous Distributions Reference</a></p>
+  <p class="topless"><a href="dynamics.html"
+                        title="previous chapter">Dynamics Reference</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/faq.txt"
@@ -83,8 +84,29 @@
 <h1>Semi-Markov Library FAQ<a class="headerlink" href="#semi-markov-library-faq" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="testing">
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
-<p>Regular testing is done on Linux and Mac with gcc 4.7, gcc 4.8, clang 3.3,
-and clang 3.4.</p>
+<p>There are three levels of testing.</p>
+<ul class="simple">
+<li><strong>Build Tests</strong> Regular testing is done on Linux and Mac with gcc 4.7, gcc 4.8, clang 3.3,
+and clang 3.4. There is a <a class="reference external" href="http://jenkins-ci.org/">Jenkins</a> instance locally that runs
+builds inside of <a class="reference external" href="http://docker.io/">Docker</a> containers. This handles builds on Ubuntu
+and Fedora. Mac builds are tested by hand.</li>
+</ul>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/jenkins_main.png"><img alt="_images/jenkins_main.png" src="_images/jenkins_main.png" style="width: 400px;" /></a>
+</div>
+<ul class="simple">
+<li><strong>System-level Tests</strong> There are currently just a few of these, namely a set of SIR
+models whose theoretical properties are known, contained in examples/sir_mixed.cpp.
+We verify the percentage of runs which become epidemic.</li>
+<li><strong>Unit Tests</strong> The distributions (exponential, Weibull, and others) have a unit test
+called disttest, built from the test directory. This samples the distributions
+and compares Kolmogorov-Smirnov estimators of those samples with theoretical results.</li>
+</ul>
+</div>
+<div class="section" id="code-style">
+<h2>Code Style<a class="headerlink" href="#code-style" title="Permalink to this headline">¶</a></h2>
+<p>The code follows the Boost library guidelines for compatibility, but Boost isn&#8217;t
+a style guide, so it follows the Google C++ Style Guide.</p>
 </div>
 </div>
 
@@ -101,7 +123,7 @@ and clang 3.4.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="distributions.html" title="Continuous Distributions Reference"
+          <a href="dynamics.html" title="Dynamics Reference"
              >previous</a> |</li>
         <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
       </ul>
