@@ -24,29 +24,19 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" />
-    <link rel="up" title="Semi-Markov Library Manual" href="manual.html" />
-    <link rel="next" title="Using ExplicitTransitions to Construct a GSPN" href="explicit.html" />
-    <link rel="prev" title="Requirements and Installation" href="install.html" /> 
+    <link rel="top" title="Semi-Markov 1.0 documentation" href="index.html" /> 
   </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="explicit.html" title="Using ExplicitTransitions to Construct a GSPN"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="install.html" title="Requirements and Installation"
-             accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
-          <li><a href="manual.html" accesskey="U">Semi-Markov Library Manual</a> &raquo;</li> 
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -57,20 +47,12 @@
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="install.html"
-                        title="previous chapter">Requirements and Installation</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="explicit.html"
-                        title="next chapter">Using ExplicitTransitions to Construct a GSPN</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/mathematics.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/mathematics.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -89,180 +71,15 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="mathematics-of-the-semi-markov-model-and-gspn">
 <h1>Mathematics of the Semi-Markov Model and GSPN<a class="headerlink" href="#mathematics-of-the-semi-markov-model-and-gspn" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="generalized-stochastic-petri-net">
 <h2>Generalized Stochastic Petri Net<a class="headerlink" href="#generalized-stochastic-petri-net" title="Permalink to this headline">¶</a></h2>
-<p>There are many flavors of GSPN defined by various authors.
-The following model was chosen to support complex epidemiological
-simulations while still representing a semi-Markov system.
-In brief, for those familiar with GSPN, this system supports
-non-exponential distributions, without inhibitor arcs, with
-colored tokens, without immediate transitions, permitting
-simultaneous transitions.</p>
-<p>The <strong>what</strong> of the GSPN is</p>
-<ul class="simple">
-<li>Places, <span class="math">\(p_1, p_2, p_3\ldots\)</span>.</li>
-<li>Transitions, <span class="math">\(e_1, e_2, e_3\ldots\)</span>. Each transition has
-input places, <span class="math">\(p_k\in I(e_i)\)</span> and output places,
-<span class="math">\(p_k\in J(e_i)\)</span>. For each pair of transition and input
-or output place, there is an integer stochiometric coefficient.
-There are no inhibitor places in this representation.</li>
-<li>Marking at each place, <span class="math">\(s_1, s_2, s_3\ldots\)</span>. The marking
-at a place is a non-negative number of tokens, <span class="math">\(q_i\)</span>. Tokens may
-have properties, <span class="math">\(\xi(q_i)\)</span>.</li>
-</ul>
-<p>The <strong>how</strong> of the GSPN is</p>
-<ol class="arabic">
-<li><p class="first">A transition becomes <em>enabled</em> when there are as many tokens on
-the input places as the stochiometric coefficients require.
-Whether the output places need to be empty is a policy choice.
-The enabling time of a transition is part of the state of the
-system.</p>
-</li>
-<li><p class="first">An enabled transition computes from the marking on its input
-and output places, and from any properties of the tokens in that
-marking, a continuous stochastic variable which determines the
-likelihood the transition will fire at any time in the future.
-This stochastic variable need not be an exponential distribution.</p>
-</li>
-<li><p class="first">The system samples jointly from the stochastic variables of every
-enabled transition in order to determine which transition fires
-next. This is described in grave detail later.</p>
-</li>
-<li><p class="first">When a transition fires, it removes from the marking of its input
-places the specified number of tokens and puts them in the output
-places. Any disparity in token count destroys or creates tokens.
-Which token is moved is specified by policy to be the first,
-last, or random token in the marking of the place.</p>
-</li>
-<li><p class="first">Transitions which do not fire fall into four classes. Those
-transitions whose input and output places are not shared with
-inputs and outputs of the fired transitions retain their
-enabling time and may not make any changes to how their
-continuous variable distributions depend on the marking.
-Any dependence between transitions must be expressed by
-sharing intput or output places.</p>
-<p>Those previously-enabled transitions which share input or output
-places, and for which the new marking still meets their
-enabling requirements, retain their original enabling times
-but may recalculate their stochastic variable distributions
-depending on the marking.</p>
-<p>Previously-enabled transitions whose input or output
-places no longer have requisite tokens for enabling become
-disabled.</p>
-<p>All transitions which may become enabled after the firing
-are enabled with an enabling time set to the current system
-time.</p>
-</li>
-</ol>
-<p>Each transition defines an independent continuous stochastic variable,
-whose density is <span class="math">\(f_\alpha(\tau, t_e)\)</span> and cumulative density
-is <span class="math">\(F_\alpha(\tau, t_e)\)</span>, where <span class="math">\(t_e\)</span> is the time
-at which the transition was enabled. If we define a new stochastic variable,
-whose value is the minimum of all of the <span class="math">\(f_\alpha\)</span>, then it
-defines the time of the next transition, and the index <span class="math">\(\alpha\)</span> of
-the transition that came first determines, by its transition&#8217;s
-change to the marking, the new system state, <span class="math">\(j\)</span>. This means we have
-a race. The racing processes are dependent only when they modify
-shared marking.</p>
-<p>If the <span class="math">\(f_\alpha\)</span> are all exponential processes, then the minimum
-of the stochastic variates is analytically-tractable, and the result
-is exactly Gillespie&#8217;s method. Using a random number generator to sample
-each process separately would, again for exponential processes, result
-in the First Reaction method. The Next Reaction method is just another
-way to do this sampling in a statistically-correct manner, valid only
-for exponential processes.</p>
-<p>For general distributions, the non-zero part of the core matrix,
-which we will call <span class="math">\(p_{nm}(\tau)\)</span> for partial core matrix,
-right after the firing of any transition, is</p>
-<div class="math">
-\[p_{nm}(\tau)=\frac{f_\alpha(\tau,t_0,t_e)}{1-F_\alpha(\tau,t_0,t_e)}\prod_\beta(1-F_\beta(s, t_0, t_e))\]</div>
-<p>Here <span class="math">\((n,m)\)</span> label states determined by how each transition, <span class="math">\(\alpha\)</span>
-changes the marking. The system has, inherently, a core matrix, but we
-compute its trajectory from this partial core matrix.</p>
 </div>
 <div class="section" id="semi-markov-processes">
 <h2>Semi-Markov Processes<a class="headerlink" href="#semi-markov-processes" title="Permalink to this headline">¶</a></h2>
-<p>There are many excellent books on semi-Markov models,
-notably <a class="reference internal" href="#howard2007" id="id1">[Howard2007]</a>. Our goal here is to define the generalized
-stochastic Petri net as a representation of a semi-Markov
-model in order to explain how the library decomposes it
-into algorithms.</p>
-<p>We define the semi-Markov process from the Markov process, following
-<a class="reference internal" href="#pyke1961" id="id2">[Pyke1961]</a>. A <em>Markov chain</em> is a discrete variable on a set of
-states, <span class="math">\(J\)</span>. At each transition, a next state is selected
-from the set <span class="math">\(J\)</span> with probability determined by the matrix
-<span class="math">\(\pi_{ij}\)</span>. You are in state <span class="math">\(i\)</span> and going to one of
-the states <span class="math">\(j\)</span>, with no specification of a time.</p>
-<p>A <em>Markov process</em> introduces the time at which the next state
-will be chosen. It is defined on a joint discrete and continuous
-space, <span class="math">\((J,X)\)</span>, where the continuous space runs from minus
-infinity to infinity. We usually think of a Markov process as
-having a continuous variable that is exponentially-distributed
-in time. With a process of this sort, you can interrupt it at
-any moment between transitions and still be able to say with
-the same certainty, that it will likely fire within a given interval.
-This property is called memorylessness. A Markov process doesn&#8217;t
-inherently have this restriction, though. The distribution of
-its continuous stochastic variable can have any distribution,
-such as Weibull, Gamma, or piecewise-continuous.</p>
-<p>While a Markov process determines the choice of the
-next state and time of the next state, a semi-Markov process
-records the state of a Markov process at any time. If we track
-the sum of times, <span class="math">\(S=∑Δt_{ij}\)</span>, then the semi-Markov
-process tracks the state of the system at time <span class="math">\(S\)</span>.
-The result is that we have a system which can have a
-non-exponential sojourn in any state.</p>
-<p>How do we simulate a trajectory from such a process?
-We use the Markov process, called the <em>embedded</em> Markov process,
-to select a state at each time. The <em>core matrix</em> determines the
-probability of selecting the next state and time.</p>
-<div class="math">
-\[q_{ij}(\tau)=P(j, \tau|i, t_0)\]</div>
-<p>There are a few choices for how to sample from a joint
-discrete and continuous process. The first method is to factorize
-the probability into a marginal and conditional distribution. Select
-uniformly from the marginal distribution, and then use that result
-to select uniformly from the conditional distribution at that value.</p>
-<div class="math">
-\[q_{ij}(\tau)=\pi_{ij}(\infty)h_{ij}(\tau)\]\[q_{ij}(\tau)=\pi_{ij}(\tau)w_{i}(\tau)\]</div>
-<p>The first equation marginalizes time-dependence to find the
-Markov chain for the system, <span class="math">\(\pi_{ij}(\infty)\)</span>. Given a chosen
-transition, the <span class="math">\(h_{ij}(\tau)\)</span> are the holding times for next
-states. The second equation marginalizes over all possible next transitions
-of the system to decide first when it will fire, as given by the
-single waiting time, <span class="math">\(w_i(\tau)\)</span>. Then, at a particular time
-it finds the probability of transtions, <span class="math">\(\pi_{ij}(\tau)\)</span>.</p>
-<p>Imagine that we had a system with a very large state space, possibly
-infinite, but that, at any point in time only a finite number of
-transitions were possible. The core matrix would be infinite, but its
-non-zero entries would be finite. We could simulate such a system
-by looking at the non-zero entries after each transition. We would just
-need to track which transitions existed at each step.</p>
-<table class="docutils citation" frame="void" id="howard2007" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[Howard2007]</a></td><td><ol class="first last upperalpha simple" start="18">
-<li><ol class="first upperalpha">
-<li>Howard, Dynamic Probabilistic Systems: Semi-Markov and Decision Processes. Mineola, NY: Dover, 2007.</li>
-</ol>
-</li>
-</ol>
-</td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="pyke1961" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[Pyke1961]</a></td><td><ol class="first last upperalpha simple" start="18">
-<li>Pyke, “Markov Renewal Process: Definition and Preliminary Properties,” Ann. Math. Stat., vol. 32, no. 4, pp. 1231–1242, 1961.</li>
-</ol>
-</td></tr>
-</tbody>
-</table>
 </div>
 </div>
 
@@ -272,25 +89,18 @@ need to track which transitions existed at each step.</p>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="explicit.html" title="Using ExplicitTransitions to Construct a GSPN"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="install.html" title="Requirements and Installation"
-             >previous</a> |</li>
-        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li>
-          <li><a href="manual.html" >Semi-Markov Library Manual</a> &raquo;</li> 
+        <li><a href="index.html">Semi-Markov 1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
+    <div class="footer">
         &copy; Copyright 2014, Andrew Dolgert, David Schneider.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3a0.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>
