@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -13,7 +15,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
+        URL_ROOT:    '',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -137,7 +139,7 @@ defined by what each entity is</p>
 </a>
 <p>An example of a <tt class="docutils literal"><span class="pre">PlaceKey</span></tt> from an SIR model shows that defining
 such a struct is verbose but painless:</p>
-<div class="highlight-python"><div class="highlight"><pre>struct SIRPlace
+<div class="highlight-python"><pre>struct SIRPlace
 {
   size_t disease;
   size_t individual;
@@ -164,16 +166,14 @@ such a struct is verbose but painless:</p>
   std::ostream&amp;
   operator&lt;&lt;(std::ostream&amp; os, const SIRPlace&amp; cp)
   {
-    return os &lt;&lt; &#39;(&#39; &lt;&lt; cp.disease &lt;&lt; &quot;, &quot; &lt;&lt; cp.individual&lt;&lt;&#39;)&#39;;
+    return os &lt;&lt; &#x27;(&#x27; &lt;&lt; cp.disease &lt;&lt; &quot;, &quot; &lt;&lt; cp.individual&lt;&lt;&#x27;)&#x27;;
   }
-};
-</pre></div>
+};</pre>
 </div>
 <p>The template parameters for <tt class="docutils literal"><span class="pre">ExplicitTransitions</span></tt> are as above:</p>
-<div class="highlight-python"><div class="highlight"><pre>typedef LocalMarking&lt;Uncolored&lt;TokenType&gt;&gt; Local;
+<div class="highlight-python"><pre>typedef LocalMarking&lt;Uncolored&lt;TokenType&gt;&gt; Local;
 typedef ExplicitTransitions&lt;PlaceKey, TransitionKey, Local,
-                            RandGen, UserState&gt; GSPN;
-</pre></div>
+                            RandGen, UserState&gt; GSPN;</pre>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">LocalMarking</span></tt> class is the marking of input and output tokens
 for a particular transition. Instead of using <tt class="docutils literal"><span class="pre">PlaceKey</span></tt> to identify
@@ -192,7 +192,7 @@ so they are in one function.</p>
 <p>A transition inherits from the <tt class="docutils literal"><span class="pre">ExplicitTransition</span></tt> template.
 It acts on the local marking to produce distributions or move
 tokens:</p>
-<div class="highlight-python"><div class="highlight"><pre>using Transition=ExplicitTransition&lt;Local,RandGen,WithParams&gt;;
+<div class="highlight-python"><pre>using Transition=ExplicitTransition&lt;Local,RandGen,WithParams&gt;;
 using Dist=TransitionDistribution&lt;RandGen&gt;;
 
 class InfectNeighbor : public Transition
@@ -217,8 +217,7 @@ class InfectNeighbor : public Transition
   {
     local_marking.template transfer_by_stochiometric_coefficient&lt;0&gt;(rng);
   }
-};
-</pre></div>
+};</pre>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">Enabled()</span></tt> method&#8217;s parameters are</p>
 <ul class="simple">
@@ -250,21 +249,20 @@ object. The builder has just three methods, <cite>add_place()</cite>,
 have, as inputs and outputs, places which exist. It ensures
 every PlaceKey and TransitionKey is unique. The signatures
 of its methods:</p>
-<div class="highlight-python"><div class="highlight"><pre>void BuildGraph::AddPlace(const PlaceKey&amp;, size_t token_layer);
+<div class="highlight-python"><pre>void BuildGraph::AddPlace(const PlaceKey&amp;, size_t token_layer);
 
 typedef std::tuple&lt;PlaceKey,int&gt; BuildGraph::PlaceEdge;
 
 void BuildGraph::AddTransition(const TransitionKey&amp;,
     const std::vector&lt;BuildGraph::PlaceEdge&gt;&amp;,
-    std::unique_ptr&lt;ExplicitTransition&lt;&lt;Local,RandGen,WithParams&gt;);
-</pre></div>
+    std::unique_ptr&lt;ExplicitTransition&lt;&lt;Local,RandGen,WithParams&gt;);</pre>
 </div>
 <p>The <cite>PlaceEdge</cite> contains a PlaceKey and a stochiometric coefficient,
 which should be negative on inputs and positive on outputs, and specifies
 the number of tokens required and the number to move when firing.</p>
 <p>For example, we can take advantage of the C++ initializer_list
 to construct a GSPN succinctly:</p>
-<div class="highlight-python"><div class="highlight"><pre>GSPN
+<div class="highlight-python"><pre>GSPN
 build_system(size_t individual_cnt)
 {
   BuildGraph&lt;GSPN&gt; bg;
@@ -309,8 +307,7 @@ build_system(size_t individual_cnt)
 
   // std::move the transitions because they contain unique_ptr.
   return std::move(bg.build());
-}
-</pre></div>
+}</pre>
 </div>
 </div>
 <div class="section" id="create-marking-and-state">
@@ -321,21 +318,19 @@ While we defined a <cite>PlaceKey</cite> above, the <cite>ExplicitTransitions</c
 class uses a different place and transition key internally,
 chosen by the Boost Graph Library implementation. Both are
 just type <cite>size_t</cite>. The marking and state are therefore:</p>
-<div class="highlight-python"><div class="highlight"><pre>using Mark=Marking&lt;size_t, Uncolored&lt;IndividualToken&gt;&gt;;
+<div class="highlight-python"><pre>using Mark=Marking&lt;size_t, Uncolored&lt;IndividualToken&gt;&gt;;
 using State=GSPNState&lt;Mark,TransitionKey,UserState&gt;;
 
-State state;
-</pre></div>
+State state;</pre>
 </div>
 <p>If the <cite>UserState</cite> had a member named <cite>parameters</cite>, then we could access
 it as <cite>state.user.parameters</cite>.</p>
 <p>How do we initialize the marking? Unfortunately, the marking doesn&#8217;t
 use our <cite>PlaceKey</cite>, so we have to add a translation step from
 the <cite>PlaceKey</cite> we know to the <cite>size_t</cite> we don&#8217;t:</p>
-<div class="highlight-python"><div class="highlight"><pre>size_t susceptible=gspn.PlaceVertex(
+<div class="highlight-python"><pre>size_t susceptible=gspn.PlaceVertex(
     PlaceKey{Disease::Susceptible, individual_idx});
-add&lt;0&gt;(state.marking, susceptible, IndividualToken{});
-</pre></div>
+add&lt;0&gt;(state.marking, susceptible, IndividualToken{});</pre>
 </div>
 <p>The GSPN remembers the original <cite>PlaceKey</cite> and will translate
 for us. The second line adds a new token to the marking.</p>
@@ -369,13 +364,12 @@ to present to a propagator
 distributions in time of the currently-enabled competing processes.
 The propagator is a function which samples these distributions to
 return the next transition to fire.:</p>
-<div class="highlight-python"><div class="highlight"><pre>using HazardPropagator=NonHomogeneousPoissonProcesses&lt;TransitionKey,RandGen&gt;;
+<div class="highlight-python"><pre>using HazardPropagator=NonHomogeneousPoissonProcesses&lt;TransitionKey,RandGen&gt;;
 HazardPropagator competing_hazards;
 using GeneralPropagator=PropagateCompetingProcesses&lt;TransitionKey,RandGen&gt;;
 GeneralPropagator other_processes;
 using Dynamics=StochasticDynamics&lt;SIRGSPN,SIRState,RandGen&gt;;
-Dynamics dynamics(gspn, {&amp;competing_hazards, &amp;other_processes});
-</pre></div>
+Dynamics dynamics(gspn, {&amp;competing_hazards, &amp;other_processes});</pre>
 </div>
 <p>It is the StochasticDynamics class that coordinates, inside, with
 the partial core matrix. It will take
@@ -386,15 +380,14 @@ When a transition changes the marking,
 the StochasticDynamics object is able to track which parts of the
 marking changed and enable or disable transitions appropriately.</p>
 <p>Finally, the main loop becomes short:</p>
-<div class="highlight-python"><div class="highlight"><pre>dynamics.Initialize(&amp;state, &amp;rng);
+<div class="highlight-python"><pre>dynamics.Initialize(&amp;state, &amp;rng);
 bool running=true;
 auto nothing=[](SIRState&amp;)-&gt;void {};
 while (running) {
   running=dynamics(state);
   output_function(state);
 }
-output_function.final(state);
-</pre></div>
+output_function.final(state);</pre>
 </div>
 <p>Here, <tt class="docutils literal"><span class="pre">output_function</span></tt> is an object which acts on the state
 and gathers results.</p>
@@ -432,7 +425,7 @@ UserState <tt class="descclassname">GSPNState::</tt><tt class="descname">user</t
 <p>For example, an instance of the following class observes
 when the number of infected individuals within a population
 has passed a given threshold:</p>
-<div class="highlight-python"><div class="highlight"><pre>template&lt;typename GSPN&gt;
+<div class="highlight-python"><pre>template&lt;typename GSPN&gt;
 class SIROutputFunction
 {
 public:
@@ -484,11 +477,10 @@ public:
       }
     }
   }
-};
-</pre></div>
+};</pre>
 </div>
 <p>We use such an object by calling it within the main loop:</p>
-<div class="highlight-python"><div class="highlight"><pre>size_t transition_cnt=0;
+<div class="highlight-python"><pre>size_t transition_cnt=0;
 auto nothing=[](SIRState&amp;)-&gt;void {};
 for ( ;
   std::get&lt;1&gt;(next)&lt;std::numeric_limits&lt;double&gt;::max();
@@ -498,8 +490,7 @@ for ( ;
       std::get&lt;1&gt;(next);
   ++transition_cnt;
   output(gspn, state);
-}
-</pre></div>
+}</pre>
 </div>
 </div>
 </div>
@@ -528,7 +519,7 @@ for ( ;
     </div>
     <div class="footer">
         &copy; Copyright 2014, Andrew Dolgert, David Schneider.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

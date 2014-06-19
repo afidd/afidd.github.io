@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -13,7 +15,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
+        URL_ROOT:    '',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -70,6 +72,12 @@
 <li><a class="reference internal" href="#implementation-of-case-1">Implementation of Case 1</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#bovine-viral-diarrhea-virus-on-a-dairy-farm">Bovine Viral-Diarrhea Virus on a Dairy Farm</a><ul>
+<li><a class="reference internal" href="#dairy-farm-model">Dairy Farm Model</a></li>
+<li><a class="reference internal" href="#disease-model">Disease Model</a></li>
+<li><a class="reference internal" href="#adding-intervention-to-the-model">Adding Intervention to the Model</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -111,7 +119,7 @@
 <div class="section" id="weiss-two-state-brownion">
 <h2>Weiss Two-state Brownion<a class="headerlink" href="#weiss-two-state-brownion" title="Permalink to this headline">¶</a></h2>
 <p>In the preface to his classic book on semi-Markov
-processes <a class="reference internal" href="references.html#howard-1971" id="id1">[Howard:1971]</a>, Howard offers the following guidance
+processes <a class="reference internal" href="references.html#howard-1971">[Howard:1971]</a>, Howard offers the following guidance
 to readers:</p>
 <blockquote class="epigraph">
 <div><em>It is often said that good ideas are simple; the Markov
@@ -196,21 +204,18 @@ store the model&#8217;s marking.</p>
 <li><p class="first"><span class="math">\(N\)</span> tokens, each with the the value <span class="math">\((S,I,R)\)</span>, where each
 token sits, for all time, at a place for each individual. A token would
 hold <span class="math">\((1,0,0)\)</span>, or <span class="math">\((0,1,0)\)</span>, or <span class="math">\((0,0,1)\)</span>.</p>
-<a class="reference internal image-reference" href="_images/metapopsir.svg"><img alt="Three individuals with state (S,I,R) and infection and recovery transitions." src="_images/metapopsir.svg" width="300px" /></a>
-</li>
+<img alt="Three individuals with state (S,I,R) and infection and recovery transitions." src="_images/metapopsir.svg" width="300px" /></li>
 <li><p class="first">Three places, one for each of  <span class="math">\((n_S, n_I, n_R)\)</span>, which contain
 a list of individuals in the state associated with that place.
 Each token at place <span class="math">\(S\)</span>
 would contain the ID of an individual. Moving tokens then changes the
 individual&#8217;s disease state.</p>
-<a class="reference internal image-reference" href="_images/sirnonexponential.svg"><img alt="Three places, with three infection transitions and three recoveries." src="_images/sirnonexponential.svg" width="400px" /></a>
-</li>
+<img alt="Three places, with three infection transitions and three recoveries." src="_images/sirnonexponential.svg" width="400px" /></li>
 <li><p class="first">A token with no internal state. There are <span class="math">\(3N\)</span> places, one for
 each combination of individual and disease state, <span class="math">\((i, SIR)\)</span>.
 The image below shows infections between individuals 1 and 2 and
 between 2 and 3, but not between 1 and 3.</p>
-<a class="reference internal image-reference" href="_images/sirindividual.svg"><img alt="Nine places with three recoveries, showing four of the six infection transitions." src="_images/sirindividual.svg" width="300px" /></a>
-</li>
+<img alt="Nine places with three recoveries, showing four of the six infection transitions." src="_images/sirindividual.svg" width="300px" /></li>
 </ol>
 </div></blockquote>
 <p>If we enumerate every possible transition in this system, for
@@ -219,7 +224,7 @@ and <span class="math">\(N\)</span> recovery transitions. Any particular infecti
 needs to answer two questions, what is its distribution if it&#8217;s enabled,
 and what does it do when it fires? The pseudocode for a transition class
 has these two methods:</p>
-<div class="highlight-python"><div class="highlight"><pre>Enabled(UserState s, LocalMarking lm, double te, double t0)-&gt;(bool, distribution)
+<div class="highlight-python"><pre>Enabled(UserState s, LocalMarking lm, double te, double t0)-&gt;(bool, distribution)
 {
   // examine local marking.
   return (is_enabled, distribution_object);
@@ -228,8 +233,7 @@ has these two methods:</p>
 Fire(UserState s, LocalMarking lm, double t0, RandGen rng)-&gt;void
 {
   // change the local marking.
-}
-</pre></div>
+}</pre>
 </div>
 <p>To determine enabling, it needs to know
 the state of two individuals whose indices are <span class="math">\((k,l)\)</span> and the time
@@ -270,8 +274,7 @@ exponentially-distributed transitions so that there are just
 three places, each of which holds a count of S, I, and R.
 This is a kind of grouped transition.</p>
 <blockquote>
-<div><a class="reference internal image-reference" href="_images/sirexponential.svg"><img alt="The classic SIR diagram. Three places, and two transitions, one for infection and one for recovery." height="150px" src="_images/sirexponential.svg" /></a>
-</div></blockquote>
+<div><img alt="The classic SIR diagram. Three places, and two transitions, one for infection and one for recovery." height="150px" src="_images/sirexponential.svg" /></div></blockquote>
 <p>The recovery transition in this classic diagram represents a recovery
 by any one of the infecteds. The distribution of the recovery transition
 is the distribution of firing times for the first of those recovery
@@ -353,20 +356,18 @@ as an example called <tt class="docutils literal"><span class="pre">sir_mixed.cp
 in two stages. First define the types, then create instances.
 First things first, let&#8217;s make a random number generator for the
 system:</p>
-<div class="highlight-python"><div class="highlight"><pre>using RandGen=std::mt19937;
-</pre></div>
+<div class="highlight-python"><pre>using RandGen=std::mt19937;</pre>
 </div>
 <p>The token doesn&#8217;t need any
 internal information because the state is carried by the place:</p>
-<div class="highlight-python"><div class="highlight"><pre>struct IndividualToken {
+<div class="highlight-python"><pre>struct IndividualToken {
   IndividualToken()=default;
-};
-</pre></div>
+};</pre>
 </div>
 <p>We have to come up with unique keys for the places and transitions.
 We could make them compact some way, but let&#8217;s be correct before
 we get fancy:</p>
-<div class="highlight-python"><div class="highlight"><pre>struct SIRPlace {
+<div class="highlight-python"><pre>struct SIRPlace {
   int64_t disease;
   int64_t individual;
   SIRPlace()=default;
@@ -384,8 +385,7 @@ struct SIRTKey
   SIRTKey()=default;
   SIRTKey(int64_t c1, int64_t c2, int64_t k) : ind1(c1), ind2(c2), kind(k) {}
   // Again create &lt;, ==, and &lt;&lt; operators.
-}
-</pre></div>
+}</pre>
 </div>
 <p>The data types are overkill, but that&#8217;s fine. We established that the
 marking could be just a count of 0 or 1 tokens, but the library only
@@ -393,8 +393,7 @@ has one way to store markings, as a list of tokens. That is sufficiently
 general. It&#8217;s called an uncolored list because we won&#8217;t select tokens by
 their ID. At this point, we need to define only the local marking,
 which is the part the transitions will see:</p>
-<div class="highlight-python"><div class="highlight"><pre>using Local=LocalMarking&lt;Uncolored&lt;IndividualToken&gt;&gt;;
-</pre></div>
+<div class="highlight-python"><pre>using Local=LocalMarking&lt;Uncolored&lt;IndividualToken&gt;&gt;;</pre>
 </div>
 <p>We also have the option of adding our own parameters to the overall state
 of the system for convenience. Keep in mind that, if some transition
@@ -402,32 +401,29 @@ modifies these parameters and another one reads them, the only way to
 ensure the system remains consistent is to recalculate every transition
 distribution afterwards. For this case, we&#8217;ll put our <span class="math">\(\beta\)</span> and
 <span class="math">\(\gamma\)</span> in here.:</p>
-<div class="highlight-python"><div class="highlight"><pre>struct WithParams {
+<div class="highlight-python"><pre>struct WithParams {
   // Put our parameters here.
   std::map&lt;int,double&gt; params;
-};
-</pre></div>
+};</pre>
 </div>
 <p>We are going to be using a class called ExplicitTransition
 which is a representation of a GSPN. It&#8217;s time to create our
 transition classes. The base class for transitions needs to
 know how the marking is stored, the random number generator,
 and any additions we&#8217;ve made to the state:</p>
-<div class="highlight-python"><div class="highlight"><pre>using SIRTransition=ExplicitTransition&lt;Local,RandGen,WithParams&gt;;
-</pre></div>
+<div class="highlight-python"><pre>using SIRTransition=ExplicitTransition&lt;Local,RandGen,WithParams&gt;;</pre>
 </div>
 <p>We might as well also make a shorthand for the distribution
 classes we&#8217;ll use. These are templated only because they involve
 the random number generator.:</p>
-<div class="highlight-python"><div class="highlight"><pre>using Dist=TransitionDistribution&lt;RandGen&gt;;
-using ExpDist=ExponentialDistribution&lt;RandGen&gt;;
-</pre></div>
+<div class="highlight-python"><pre>using Dist=TransitionDistribution&lt;RandGen&gt;;
+using ExpDist=ExponentialDistribution&lt;RandGen&gt;;</pre>
 </div>
 <p>Now it&#8217;s time to make a transition. We saw pseudocode above.
 We expect the Enable method to examine the local marking, whose inputs
 are an ordered list of tokens containers at places, and return
 a distribution. The firing function should move those tokens.:</p>
-<div class="highlight-python"><div class="highlight"><pre>class InfectNeighbor : public SIRTransition
+<div class="highlight-python"><pre>class InfectNeighbor : public SIRTransition
 {
   virtual std::pair&lt;bool, std::unique_ptr&lt;Dist&gt;&gt;
   Enabled(const UserState&amp; s, const Local&amp; lm,
@@ -444,8 +440,7 @@ a distribution. The firing function should move those tokens.:</p>
     BOOST_LOG_TRIVIAL(trace) &lt;&lt; &quot;Fire infection &quot; &lt;&lt; lm;
     lm.template TransferByStochiometricCoefficient&lt;0&gt;(rng);
   }
-};
-</pre></div>
+};</pre>
 </div>
 <p>The notation for <tt class="docutils literal"><span class="pre">lm.template</span> <span class="pre">InputTokensSufficient&lt;0&gt;()</span></tt> is a rarely-seen
 but perfectly normal (for C++) way to call the templated method
@@ -453,8 +448,7 @@ but perfectly normal (for C++) way to call the templated method
 The template paramter, that <tt class="docutils literal"><span class="pre">&lt;0&gt;</span></tt>, says that this is the first,
 and only for this simulation, type of token. Had we defined our
 local marking with:</p>
-<div class="highlight-python"><div class="highlight"><pre>using Local=LocalMarking&lt;Uncolored&lt;IndividualToken&gt;,Uncolored&lt;OtherToken&gt;&gt;;
-</pre></div>
+<div class="highlight-python"><pre>using Local=LocalMarking&lt;Uncolored&lt;IndividualToken&gt;,Uncolored&lt;OtherToken&gt;&gt;;</pre>
 </div>
 <p>then there would be a token type <tt class="docutils literal"><span class="pre">&lt;1&gt;</span></tt>. This
 transition assumes that the GSPN will be hooked together in such a
@@ -462,7 +456,7 @@ way that there are two inputs, one from an S place, one from an I, with
 stoichiometric coefficients of -1 on each, so that the <tt class="docutils literal"><span class="pre">InputTokensSufficient</span></tt>
 method can just count the tokens to determine if the transition is enabled.
 We could, alternatively, do the work ourselves:</p>
-<div class="highlight-python"><div class="highlight"><pre>class InfectNeighbor : public SIRTransition
+<div class="highlight-python"><pre>class InfectNeighbor : public SIRTransition
 {
   virtual std::pair&lt;bool, std::unique_ptr&lt;Dist&gt;&gt;
   Enabled(const UserState&amp; s, const Local&amp; lm,
@@ -481,17 +475,15 @@ We could, alternatively, do the work ourselves:</p>
     // Move from input place 1 to place 3 (output) one token.
     lm.template Move&lt;0&gt;(1, 3, 1);
   }
-};
-</pre></div>
+};</pre>
 </div>
 <p>This version assumes the first place is the infector, the second
 place the susceptible, and the fourth place the newly-infected token&#8217;s place.
 We ensure our assumptions are correct when constructing the
 GSPN later. The ExplicitTransitions representation is itself
 parameterized:</p>
-<div class="highlight-python"><div class="highlight"><pre>using SIRGSPN=
-  ExplicitTransitions&lt;SIRPlace, SIRTKey, Local, RandGen, WithParams&gt;;
-</pre></div>
+<div class="highlight-python"><pre>using SIRGSPN=
+  ExplicitTransitions&lt;SIRPlace, SIRTKey, Local, RandGen, WithParams&gt;;</pre>
 </div>
 <p>We created a <tt class="docutils literal"><span class="pre">LocalMarking</span></tt> with which a transition can grab
 tokens from places to which it is connected in the GSPN. The
@@ -501,13 +493,11 @@ by the system uses this set. It&#8217;s an annoyance, but it lets the
 code create more efficient graph structures. Because of this,
 we ask the <tt class="docutils literal"><span class="pre">ExplicitTransitions</span></tt> object how it annotates places
 for the <tt class="docutils literal"><span class="pre">Marking</span></tt> storage.:</p>
-<div class="highlight-python"><div class="highlight"><pre>using Mark=Marking&lt;SIRGSPN::PlaceKey, Uncolored&lt;IndividualToken&gt;&gt;;
-</pre></div>
+<div class="highlight-python"><pre>using Mark=Marking&lt;SIRGSPN::PlaceKey, Uncolored&lt;IndividualToken&gt;&gt;;</pre>
 </div>
 <p>The state of the system is now the marking, the enabling times
 of all transitions, and our little bit of user state we threw in:</p>
-<div class="highlight-python"><div class="highlight"><pre>using SIRState=GSPNState&lt;Mark,SIRGSPN::TransitionKey,WithParams&gt;;
-</pre></div>
+<div class="highlight-python"><pre>using SIRState=GSPNState&lt;Mark,SIRGSPN::TransitionKey,WithParams&gt;;</pre>
 </div>
 </div>
 <div class="section" id="create-instances">
@@ -528,7 +518,7 @@ the list of edges to places, where each edge has stoichiometry,
 and finally by including the transition object itself.
 Look for places as a pair of (disease state, individual) and
 for transitions as a triple of (individual, individual, reaction_kind).:</p>
-<div class="highlight-python"><div class="highlight"><pre>SIRGSPN
+<div class="highlight-python"><pre>SIRGSPN
 BuildSystem(int64_t individual_cnt)
 {
 BuildGraph&lt;SIRGSPN&gt; bg;
@@ -567,8 +557,7 @@ for (int64_t left_idx=0; left_idx&lt;individual_cnt-1; left_idx++) {
   }
 }
 return std::move(bg.Build());
-}
-</pre></div>
+}</pre>
 </div>
 <p>The use of <tt class="docutils literal"><span class="pre">unique_ptr</span></tt> helps us avoid memory leaks.
 We&#8217;ve build a GSPN. Now what? We need to create an
@@ -578,25 +567,23 @@ initial marking and to run the system.</p>
 <h4>Initializing the State<a class="headerlink" href="#initializing-the-state" title="Permalink to this headline">¶</a></h4>
 <p>We already made an <tt class="docutils literal"><span class="pre">SIRState</span></tt> type. We can create it and
 initialize our <tt class="docutils literal"><span class="pre">WithParams</span></tt> extra state.:</p>
-<div class="highlight-python"><div class="highlight"><pre>SIRState state;
+<div class="highlight-python"><pre>SIRState state;
 state.user.params[0]=beta;
-state.user.params[1]=gamma;
-</pre></div>
+state.user.params[1]=gamma;</pre>
 </div>
 <p>More interesting is creating our first individuals in susceptible
 states and making one of them an infected. The <tt class="docutils literal"><span class="pre">Marking</span></tt> doesn&#8217;t
 use the same <tt class="docutils literal"><span class="pre">SIRKey</span></tt> that we defined, so we have to translate our
 keys and then add the token to the marking with a free function <tt class="docutils literal"><span class="pre">Add</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre>for (int64_t individual=0; individual&lt;individual_cnt; ++individual) {
+<div class="highlight-python"><pre>for (int64_t individual=0; individual&lt;individual_cnt; ++individual) {
   auto susceptible=gspn.PlaceVertex({0, individual});
   Add&lt;0&gt;(state.marking, susceptible, IndividualToken{});
-}
-</pre></div>
+}</pre>
 </div>
 <p>We want one of those to be an infected. Here&#8217;s a complicated way to
 initialize the infected. Move a token from susceptible to infected,
 after first choosing one at random.:</p>
-<div class="highlight-python"><div class="highlight"><pre>// The initial input string moves a token from susceptible to infected.
+<div class="highlight-python"><pre>// The initial input string moves a token from susceptible to infected.
 auto first_case=static_cast&lt;int64_t&gt;(
     smv::uniform_index(rng, individual_cnt));
 BOOST_LOG_TRIVIAL(trace)&lt;&lt;&quot;First case is &quot;&lt;&lt;first_case;
@@ -605,8 +592,7 @@ int64_t first_i=gspn.PlaceVertex({1, first_case});
 auto input_string=[&amp;first_s, &amp;first_i](SIRState&amp; state)-&gt;void {
   Move&lt;0,0&gt;(state.marking, first_s, first_i, 1);
 };
-input_string(state);
-</pre></div>
+input_string(state);</pre>
 </div>
 <p>The template <tt class="docutils literal"><span class="pre">&lt;0,0&gt;</span></tt> says that this is moving the <tt class="docutils literal"><span class="pre">Uncolored&lt;SIRToken&gt;</span></tt>
 specified first in the list of token types to the local marking.</p>
@@ -622,7 +608,7 @@ continuous time to which we will hand our model.</p>
 at changes to the state of the system and record what
 happens. This object&#8217;s methods are very general and take
 a simple form.:</p>
-<div class="highlight-python"><div class="highlight"><pre>template&lt;typename SIRState&gt;
+<div class="highlight-python"><pre>template&lt;typename SIRState&gt;
 struct SIROutput
 {
   int64_t step_cnt{0};
@@ -637,8 +623,7 @@ struct SIROutput
   void final(const SIRState&amp; state) {
     BOOST_LOG_TRIVIAL(info) &lt;&lt; &quot;Took &quot;&lt;&lt; step_cnt &lt;&lt; &quot; transitions.&quot;;
   }
-};
-</pre></div>
+};</pre>
 </div>
 <p>The trick to writing one of these is to look up in the
 reference section what&#8217;s in the state. You&#8217;ll find the
@@ -653,11 +638,10 @@ the model and find the next step. There are two pieces to
 this. The <tt class="docutils literal"><span class="pre">StochasticDynamics</span></tt> collects all enabled transitions
 into a list and presents them to a <tt class="docutils literal"><span class="pre">Propagator</span></tt> which then
 uses statistical methods to choose among the list of transitions:</p>
-<div class="highlight-python"><div class="highlight"><pre>using Propagator=NonHomogeneousPoissonProcesses&lt;int64_t,RandGen&gt;;
+<div class="highlight-python"><pre>using Propagator=NonHomogeneousPoissonProcesses&lt;int64_t,RandGen&gt;;
 Propagator competing;
 using Dynamics=StochasticDynamics&lt;SIRGSPN,SIRState,RandGen&gt;;
-Dynamics dynamics(gspn, {&amp;competing});
-</pre></div>
+Dynamics dynamics(gspn, {&amp;competing});</pre>
 </div>
 <p>The various propagators are stronger or weaker at dealing with
 the different types of distributions. This one, the
@@ -669,15 +653,14 @@ and much slower First Reaction method.</p>
 <p>Because the next time step is determined by the mathematically-defined
 minimum of the stochastic variables, we can just hand our
 GSPN object to the dynamics and ask it for the next step.:</p>
-<div class="highlight-python"><div class="highlight"><pre>dynamics.Initialize(&amp;state, &amp;rng);
+<div class="highlight-python"><pre>dynamics.Initialize(&amp;state, &amp;rng);
 
 bool running=true;
 while (running) {
   running=dynamics(state);
   output_function(state);
 }
-output_function.final(state);
-</pre></div>
+output_function.final(state);</pre>
 </div>
 <p>We can stop the loop at any point, but it will return
 that it is not running at any point when there are no
@@ -690,14 +673,13 @@ enabled transitions.</p>
 state, where each token has the value <span class="math">\((s,i,r)\)</span>,
 how would we define the tokens and transitions?
 The token itself is just a struct.:</p>
-<div class="highlight-python"><div class="highlight"><pre>struct MetaToken {
+<div class="highlight-python"><pre>struct MetaToken {
   int s;
   int i;
   int r;
   MetaToken()=default;
   MetaToken(int s, int i, int r) : s(s), i(i), r(r) {}
-};
-</pre></div>
+};</pre>
 </div>
 <p>More interesting are the transitions. How do we grab
 and read or modify the token? We have to look inside the
@@ -705,7 +687,7 @@ token in the local marking. This is done by applying a function
 to the token. We pass into the local marking a functor, but
 the local marking returns two things, whether it found
 a token and then the result of the functor.:</p>
-<div class="highlight-python"><div class="highlight"><pre>class Infect : public MetaTransition {
+<div class="highlight-python"><pre>class Infect : public MetaTransition {
   virtual std::pair&lt;bool, std::unique_ptr&lt;Dist&gt;&gt;
   Enabled(const UserState&amp; s, const Local&amp; lm, double te,
       double t0) const override {
@@ -739,13 +721,96 @@ a token and then the result of the functor.:</p>
       mt.s=0;
     });
   }
-};
-</pre></div>
+};</pre>
 </div>
 <p>We are still checking for a susceptible and an infected to determine
 enabling, and then the firing transition moves a susceptible into
 an infected state. It just does it by modifying the token
 rather than moving the token to a place.</p>
+</div>
+</div>
+<div class="section" id="bovine-viral-diarrhea-virus-on-a-dairy-farm">
+<h2>Bovine Viral-Diarrhea Virus on a Dairy Farm<a class="headerlink" href="#bovine-viral-diarrhea-virus-on-a-dairy-farm" title="Permalink to this headline">¶</a></h2>
+<p>There is an excellent paper by <a class="reference internal" href="references.html#viet-2004">[Viet:2004]</a> and others on
+Bovine viral-diarrhea virus (BVDV) spread in dairy farms.
+In this paper, the authors construct and run a discrete, stochastic,
+continuous-time model for herds of cows at a dairy farm.
+We describe now
+how one would implement their simulation with the Semi-Markov
+library instead of writing the whole thing by hand.</p>
+<p>There will be two layers to this simulation.</p>
+<ol class="arabic simple">
+<li>Farm management for a dairy farm. Data for this model comes
+from published studies on such topics as typical farm sizes,
+parturition timing, and cow life span. This model was run
+and validated on its own before further complication.</li>
+<li>Disease spread on that farm. This disease can cause
+transient or persistent infection. It can cause
+abortion in the cow, depending on timing of infection.</li>
+</ol>
+<p>In a larger context, the single-farm simulation could be used
+to estimate, statistically, how long it takes from introducing
+an infected cow to finding an infected cow on a truck to another
+farm. This would then form the basis for a stochastic farm-to-farm model,
+even on a national scale, which would incorporate both
+known farm management practices and uncertainty about disease
+processes.</p>
+<div class="section" id="dairy-farm-model">
+<h3>Dairy Farm Model<a class="headerlink" href="#dairy-farm-model" title="Permalink to this headline">¶</a></h3>
+<p>The dairy farm model groups cows into four herds, the
+calves, heifers before breeding, heifers after breeding,
+and dairy cows. We typically make diagrams like
+this below.</p>
+<div class="figure align-center">
+<img src="_images/bvd_gist.svg" width="200px" /></div>
+<p>There are a host of rules for the farm. For instance, the
+male calves are sold at about ten days. Heifer breeding
+times, likelihood of giving birth, and likelihood of selling
+or destroying a dairy cow all enter the model as hazard
+rates in the GSPN. This GSPN is a formalization of the
+diagram above.</p>
+<div class="figure align-center">
+<img height="300px" src="_images/viet-farm.svg" /></div>
+<p>You don&#8217;t see in the figure above that the rates of transitions
+are quite complicated because they are taken from
+field observations of farm management practices.</p>
+<p>For this model, each token in the simulation represents
+a unique cow. The token carries a birth date and records
+the cow&#8217;s parity. Transitions will move cows from one herd
+to another, or out of the simulation. Births create new tokens.</p>
+</div>
+<div class="section" id="disease-model">
+<h3>Disease Model<a class="headerlink" href="#disease-model" title="Permalink to this headline">¶</a></h3>
+<p>The disease model is more complicated than just SIR
+because it accounts for immunity and persistent infection.
+It also labels infection states differently depending on
+how long the cow has been pregnant because this determines
+the likelihood of survival and/or persistent infection of
+the calf.</p>
+<div class="figure">
+<img height="400px" src="_images/viet-factored.svg" /></div>
+<p>Overlaying this model on top of the farm model means
+that each cow can now be both in a herd and in
+one of these disease states. It requires composing the
+two graphs. The token still represents unique cows.</p>
+</div>
+<div class="section" id="adding-intervention-to-the-model">
+<h3>Adding Intervention to the Model<a class="headerlink" href="#adding-intervention-to-the-model" title="Permalink to this headline">¶</a></h3>
+<p>We&#8217;ve described what was in the paper. What would
+it look like if we added a vaccination intervention
+to this model? Vaccination would create a new
+state for the disease portion. We could account for
+availability of a veterinarian by including a second
+type of token in the model.</p>
+<div class="figure">
+<img src="_images/viet-vet.svg" width="300px" /></div>
+<p>There would could be a
+veterinarian-at-work place and then a separate
+veterinarian-at-farm place for each farm in the model.
+The token then moves to farms with some hazard rate
+and dwells at each farm for a time. While the token
+is present at the farm, a herd can transition from
+susceptible to an immune-vaccinated state.</p>
 </div>
 </div>
 </div>
@@ -774,7 +839,7 @@ rather than moving the token to a place.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2014, Andrew Dolgert, David Schneider.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

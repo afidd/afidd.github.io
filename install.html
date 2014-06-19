@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -13,7 +15,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
+        URL_ROOT:    '',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -117,12 +119,11 @@ and ensure you have a full set of one of the
 variants. If your library sits somewhere like
 <tt class="docutils literal"><span class="pre">/usr/local/boost_1_54_0mt/lib/libboost_chrono-mt.so,</span></tt> then build
 with the following options to configure:</p>
-<div class="highlight-python"><div class="highlight"><pre>./configure --with-boost=/usr/local/boost_1_54_0mt --enable-variant=-mt
-</pre></div>
+<div class="highlight-python"><pre>./configure --with-boost=/usr/local/boost_1_54_0mt --enable-variant=-mt</pre>
 </div>
 <p>Proper choice of boost directory and variant will lead to a string of
 <tt class="docutils literal"><span class="pre">yes</span></tt> in the configure output:</p>
-<div class="highlight-python"><div class="highlight"><pre>checking for exit in -lpthread... yes
+<div class="highlight-python"><pre>checking for exit in -lpthread... yes
 checking for exit in -lboost_system... yes
 checking for exit in -lboost_random... yes
 checking for exit in -lboost_program_options... yes
@@ -130,27 +131,23 @@ checking for exit in -lboost_filesystem... yes
 checking for exit in -lboost_date_time... yes
 checking for exit in -lboost_log... yes
 checking for exit in -lboost_log_setup... yes
-checking for exit in -lboost_unit_test_framework... yes
-</pre></div>
+checking for exit in -lboost_unit_test_framework... yes</pre>
 </div>
 </li>
 <li><p class="first">Modify the destination directory by adding a flag to configure:</p>
-<div class="highlight-python"><div class="highlight"><pre>./configure --prefix=$HOME
-</pre></div>
+<div class="highlight-python"><pre>./configure --prefix=$HOME</pre>
 </div>
 <p>With this option, the headers will install into the directory
 <tt class="docutils literal"><span class="pre">$HOME/include/semimarkov-0.1</span></tt>.
 It is possible to modify the compiler and linker flags:</p>
-<div class="highlight-python"><div class="highlight"><pre>./configure CXX=g++ CXXFLAGS=&quot;-O2 -march=native&quot;
-</pre></div>
+<div class="highlight-python"><pre>./configure CXX=g++ CXXFLAGS=&quot;-O2 -march=native&quot;</pre>
 </div>
 <p>All of these sample flags can be used in combination, and help
 is found with ./configure &#8211;help.</p>
 </li>
 <li><p class="first">Lastly, make the examples and install the headers:</p>
-<div class="highlight-python"><div class="highlight"><pre>make
-make install
-</pre></div>
+<div class="highlight-python"><pre>make
+make install</pre>
 </div>
 </li>
 </ol>
@@ -186,7 +183,7 @@ make install
     </div>
     <div class="footer">
         &copy; Copyright 2014, Andrew Dolgert, David Schneider.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

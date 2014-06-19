@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -13,7 +15,7 @@
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
+        URL_ROOT:    '',
         VERSION:     '1.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -95,8 +97,8 @@
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>The <tt class="docutils literal"><span class="pre">Semi-Markov</span></tt> library is designed to streamline the process of
 creating efficient simulations of a large class of systems called
-semi-Markov processes <a class="reference internal" href="references.html#howard-1971" id="id1">[Howard:1971]</a>.  Semi-Markov processes naturally
-arise in many contexts including epidemiology <a class="reference internal" href="references.html#viet-2004" id="id2">[Viet:2004]</a>, physiology,
+semi-Markov processes <a class="reference internal" href="references.html#howard-1971">[Howard:1971]</a>.  Semi-Markov processes naturally
+arise in many contexts including epidemiology <a class="reference internal" href="references.html#viet-2004">[Viet:2004]</a>, physiology,
 ecology, atmospheric sciences, reliability engineering and risk
 management.  This broad range of applications suggest the value of
 designing a generic library for simulating complex semi-Markov
@@ -119,7 +121,7 @@ distributed transition times have time-independent transition rates.
 This is the norm in some application areas such as chemical kinetics.
 In contrast, it is manifestly inappropriate for many biological
 applications such as physiology, ecology and epidemiology.  For
-example, a classic paper by Stocks <a class="reference internal" href="references.html#stocks-1931" id="id3">[Stocks:1931]</a> clearly shows that
+example, a classic paper by Stocks <a class="reference internal" href="references.html#stocks-1931">[Stocks:1931]</a> clearly shows that
 the latent period for measles (the distribution times between
 infection and the appearance of symptoms) does not follow an
 exponential distribution. Stocks&#8217; raw data from cases in London circa
@@ -155,8 +157,7 @@ including distributions of transition times, modification of system
 state and various dependence relationships.</li>
 </ul>
 <div class="figure align-center">
-<a class="reference internal image-reference" href="_images/large-structureb.svg"><img src="_images/large-structureb.svg" width="400px" /></a>
-</div>
+<img src="_images/large-structureb.svg" width="400px" /></div>
 <p>This organization has many practical advantages:</p>
 <ul class="simple">
 <li>The semi-Markov process layer can be viewed as a very efficient,
@@ -181,19 +182,18 @@ errors associated with multithreading at compile time.</li>
 step in achieving larger goals. The goal could be <em>model selection</em>
 to ask which conceptual process best describes observed data.
 It could be <em>optimization</em> of interventions to hinder or encourage
-an outcome. For example, see <a class="reference internal" href="references.html#hartig2011" id="id4">[Hartig2011]</a> on using dynamical models
+an outcome. For example, see <a class="reference internal" href="references.html#hartig2011">[Hartig2011]</a> on using dynamical models
 for <em>inference.</em> These larger goals guide construction of a
 conceptual model for the problem, one that includes those behaviors
 that seem most relevant.</p>
 <p>The steps from conception to having a running program which uses
 the Semi-Markov library are:</p>
 <div class="figure align-center">
-<a class="reference internal image-reference" href="_images/multi-large.svg"><img src="_images/multi-large.svg" width="800px" /></a>
-</div>
+<img src="_images/multi-large.svg" width="800px" /></div>
 <ol class="arabic simple">
 <li>A conceptual model for the system. What actors and resources are
 in the domain? What behaviors are important? A paper by
-<a class="reference internal" href="references.html#grimm2010" id="id5">[Grimm2010]</a> and others goes into more detail for the ecology realm.</li>
+<a class="reference internal" href="references.html#grimm2010">[Grimm2010]</a> and others goes into more detail for the ecology realm.</li>
 <li>A survival analysis of that conceptual model. There are books and
 statistics courses on survival analysis. Field observations are
 processed with statistical estimators to produce estimated
@@ -248,7 +248,7 @@ with the USDA Agricultural Research Service.  This work was supported by the Sci
     </div>
     <div class="footer">
         &copy; Copyright 2014, Andrew Dolgert, David Schneider.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>
