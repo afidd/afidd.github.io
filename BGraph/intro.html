@@ -1,0 +1,214 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; BGraph 1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="BGraph 1 documentation" href="index.html" />
+    <link rel="next" title="Design" href="design.html" />
+    <link rel="prev" title="Welcome to BGraph’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="design.html" title="Design"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to BGraph’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">BGraph 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>This package implements an adjacency list, along the textbook
+definitions, using the Boost.Graph interface. Where Boost.Graph
+returns an opaque <tt class="docutils literal"><span class="pre">vertex_descriptor</span></tt>, this package returns
+an instance of a type which is internal to the package, so it&#8217;s the
+moral equivalent.</p>
+<p>This package is slower than Graphs.jl. The data structure is more
+compact, but maybe it could use optimization. It is young, yet.</p>
+<div class="section" id="create-an-adjacencylist">
+<h2>Create an AdjacencyList<a class="headerlink" href="#create-an-adjacencylist" title="Permalink to this headline">¶</a></h2>
+<p>Choose what data structure stores the list of
+vertices (VC) and what data structure stores the list of neighbors
+of each vertex (NC). Choose what extra properties each vertex (VP), edge (EP),
+and graph (GP) should store additionally. For instance,:</p>
+<div class="highlight-python"><pre>adj=AdjacencyList(Vector,Deque,Int,Float,&quot;my graph&quot;)
+println(graph_property(adj)) # &quot;my graph&quot;
+v1=add_vertex!(3, adj)
+v2=add_vertex!(7, adj)
+println(vertex_property(v2, adj)) # 7
+e1=add_edge!(v1, v2, 2.6, adj)
+println(edge_property(e1, adj)) # 2.6</pre>
+</div>
+<p>Choices for vertex storage are</p>
+<blockquote>
+<div><ul class="simple">
+<li>Vector&#8212;This makes the vertex_descriptor an integer. Slower for growing
+the graph.</li>
+<li>Deque&#8212;The vertex_descriptor is some internal type. Faster for growing
+the graph.</li>
+<li>Dict&#8212;Specify a dict by creating a TypeConstructor, using a typealias.
+&#8220;typealias IntDict{T} Dict{Int,T}&#8221; Then pass <tt class="docutils literal"><span class="pre">IntDict</span></tt> as the argument.
+When using a dict, add a key value when calling <tt class="docutils literal"><span class="pre">add_vertex!(key,</span> <span class="pre">value,</span> <span class="pre">graph)</span></tt>.</li>
+</ul>
+</div></blockquote>
+<p>Choices for neighbor storage are</p>
+<blockquote>
+<div><ul class="simple">
+<li>Vector&#8212;A compact storage choice. Using a Vector here doesn&#8217;t affect
+naming of vertices and doesn&#8217;t make the <tt class="docutils literal"><span class="pre">edge_descriptor</span></tt> type any more
+simple. It is always possible to make an edge with the method
+<tt class="docutils literal"><span class="pre">edge(vertex_descriptor,</span> <span class="pre">vertex_descriptor)</span></tt>.</li>
+<li>Deque&#8212;Would grow faster.</li>
+<li>Set&#8211;Using a set guarantees that there is only one edge between any
+two vertices.</li>
+</ul>
+</div></blockquote>
+<p>The graph can be created as undirected, as well:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">adj</span><span class="o">=</span><span class="n">AdjacencyList</span><span class="p">(</span><span class="n">Vector</span><span class="p">,</span><span class="n">Deque</span><span class="p">,</span><span class="n">Int</span><span class="p">,</span><span class="n">Float</span><span class="p">,</span><span class="s">&quot;my graph&quot;</span><span class="p">,</span> <span class="n">is_directed</span><span class="o">=</span><span class="n">false</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This creates a reverse edge for each edge added.</p>
+</div>
+<div class="section" id="working-with-an-adjacencylist">
+<h2>Working with an AdjacencyList<a class="headerlink" href="#working-with-an-adjacencylist" title="Permalink to this headline">¶</a></h2>
+<p>Properties attached to a graph, edge, or vertex, can be any type:</p>
+<div class="highlight-python"><pre>type EdgeProperty
+  weight::Float64
+  stoichiometry::Int
+end
+
+adj=AdjacencyList(Vector,Deque,Int,EdgeProperty,&quot;my graph&quot;)
+v1=add_vertex!(3, adj)
+v2=add_vertex!(7, adj)
+e1=add_edge!(v1, v2, EdgeProperty(0.6, -2), adj)
+println(edge_property(e1).stoichiometry, adj) # -2</pre>
+</div>
+<p>In order to omit a property, specify it as a tuple type.
+For instance add no types with:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">adj</span><span class="o">=</span><span class="n">AdjacencyList</span><span class="p">(</span><span class="n">Vector</span><span class="p">,</span><span class="n">Deque</span><span class="p">,</span> <span class="p">(),</span> <span class="p">(),</span> <span class="p">())</span>
+</pre></div>
+</div>
+<p>Access behaves as with Boost.Graph:</p>
+<div class="highlight-python"><pre>for v in vertices(adj)
+  for out_edge in out_edges(v, adj)
+    if edge_property(out_edge, adj).stoichiometry&lt;0
+      println(edge_property(out_edge, adj).weight)
+    end
+  end
+end
+
+assert(v1==source(e1, adj))
+assert(v2==target(e1, adj))
+assert(e1==edge(v1, v2, adj))
+assert(2==num_vertices(adj))
+assert(1==num_edges(adj))
+assert(1==out_degree(v1, adj))
+
+for n in out_neighbors(v1, adj)
+  assert(n==v2)
+end</pre>
+</div>
+<p>There is no way to remove an edge or vertex.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#create-an-adjacencylist">Create an AdjacencyList</a></li>
+<li><a class="reference internal" href="#working-with-an-adjacencylist">Working with an AdjacencyList</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to BGraph&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="design.html"
+                        title="next chapter">Design</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/intro.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="design.html" title="Design"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to BGraph’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">BGraph 1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Andrew Dolgert.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
